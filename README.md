@@ -51,6 +51,11 @@ If the above command fails, install all packages from the file with
 pip install <package-name>
 ```
 
+To generate the database:
+```
+python manage.py migrate
+```
+
 To start the backend, go to folder *backend* and run:
 ```
 python manage.py runserver
