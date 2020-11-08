@@ -1,8 +1,15 @@
 # Document scanner and organizer
 Raspberry Pi and multitouch table based document organizer for the project at Next Generation User Interfaces lecture.
 
-### Development setup
-#### Prerequisites
+## Table of contents
++ [Development setup](#development-setup)
+  - [Prerequisites](#prerequisites)
+  - [Virtual environment](#virtual-environment)
+  - [Backend](#backend)
+  - [Frontend](#frontend)
+
+## Development setup
+### Prerequisites
 Install Python 3 from: https://www.python.org/downloads/ 
 
 Install Node.js and NPM from: https://nodejs.org/en/download/ 
@@ -16,7 +23,7 @@ npm -v
 
 Install your preferred IDEs for development, I use **Pycharm** for *python* and **VS Code** for *React*. The last one is a preference, you can edit the React code from Pycharm just as well.
 
-#### Virtual environment
+### Virtual environment
 Create virtual environment, either:
 1. From **Pycharm** from bottom right corner, click on your *Python version->Add interpreter...*, leave the defaults and click *OK*
 2. From command line:
@@ -34,8 +41,8 @@ Deactivate: `deactivate`
 
 > **Note:** *venv* is the name of the virtual environment and can be something else. I advise you to call it *venv* to avoid accidentally pushing it to the repository, since only *env* and *venv* are ignored by git.
 
-#### Backend
-**~I am not sure if this works yet, will fix in the future~**
+### Backend
+***I am not sure if this works yet, will fix in the future***
 ```
 pip install -r requirements.txt
 ```
@@ -49,7 +56,7 @@ To start the backend, go to folder *backend* and run:
 python manage.py runserver
 ```
 
-#### Frontend
+### Frontend
 Go to folder *frontend*.
 
 To install dependencies run:
