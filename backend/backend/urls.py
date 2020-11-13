@@ -25,5 +25,7 @@ router = routers.DefaultRouter()
 router.register(r'documents', views.DocumentView, 'document')
 
 urlpatterns = [
-    path('admin/', admin.site.urls), path('api/', include(router.urls))
+    path('admin/', admin.site.urls),
+    path('api/', include(router.urls)),
+    path('camera_feed', views.camera_feed, name='camera_feed'),
 ]
