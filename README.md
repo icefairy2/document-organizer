@@ -60,6 +60,8 @@ To start the backend, go to folder *backend* and run:
 python manage.py runserver
 ```
 
+Create folder _scanned_documents_ under *document-organizer/backend*.
+
 ### Frontend
 Go to folder *frontend*.
 

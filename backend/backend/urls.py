@@ -23,7 +23,8 @@ from docscanner import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/documents/', views.document_list, name='documents'),
-    path('api/document/', views.document, name='document'),
-    path('camera_feed', views.camera_feed, name='camera_feed'),
+    path('api/documents/', views.document_list),
+    path('api/document/', views.document),
+    path('api/document/<str:file>/', views.document),
+    path('camera_feed', views.camera_feed),
 ]

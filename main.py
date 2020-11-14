@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import utils
+from backend.docscanner import utils
 
 ########################################################################
 webCamFeed = True
