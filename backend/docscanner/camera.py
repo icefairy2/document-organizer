@@ -14,3 +14,9 @@ class VideoCamera(object):
         # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         ret, jpeg = cv2.imencode('.jpg', image)
         return jpeg.tobytes()
+
+    def get_cv_frame(self):
+        success, image = self.video.read()
+
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        return gray

@@ -21,11 +21,9 @@ from django.urls import path, include
 from rest_framework import routers
 from docscanner import views
 
-router = routers.DefaultRouter()
-router.register(r'documents', views.DocumentView, 'document')
-
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
+    path('api/documents/', views.document_list, name='documents'),
+    path('api/document/', views.document, name='document'),
     path('camera_feed', views.camera_feed, name='camera_feed'),
 ]
