@@ -1,22 +1,42 @@
-import logo from './logo.svg';
 import './App.css';
+import Button from '@material-ui/core/Button';
+import SaveIcon from '@material-ui/icons/Save';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme) => ({
+  button: {
+    margin: theme.spacing(1),
+  },
+}));
+
+function handleSave() {
+  fetch('http://localhost:8000/api/document/', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({})
+  });
+};
 
 function App() {
+  const classes = useStyles();
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+        <img src="http://localhost:8000/camera_feed" alt="camera_feed" />
+        <Button
+          variant="contained"
+          color="primary"
+          size="large"
+          className={classes.button}
+          startIcon={<SaveIcon />}
+          onClick={handleSave}
         >
-          Learn React
-        </a>
+          Save
+      </Button>
       </header>
     </div>
   );
