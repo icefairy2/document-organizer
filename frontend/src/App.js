@@ -1,45 +1,57 @@
-import './App.css';
-import Button from '@material-ui/core/Button';
-import SaveIcon from '@material-ui/icons/Save';
+import React, { useRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
+import Scanner from './Scanner';
+import Desktop from './Desktop';
 
 const useStyles = makeStyles((theme) => ({
-  button: {
-    margin: theme.spacing(1),
-  },
+    root: {
+        flexGrow: 1,
+        height: '100%',
+        width: '100%',
+        position: 'absolute',
+        top: '0',
+        left: '0',
+    },
+    paper: {
+        padding: theme.spacing(1),
+        textAlign: 'center',
+        color: theme.palette.text.secondary,
+        backgroundColor: "#aeaeae",
+    },
+    desktop: {
+        padding: theme.spacing(0),
+        backgroundColor: "#aeaeae",
+        paddingRight: 0,
+        height: '100%'
+    }
 }));
 
-function handleSave() {
-  fetch('http://localhost:8000/api/document/', {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({})
-  });
-};
+export default function CenteredGrid() {
+    const classes = useStyles();
 
-function App() {
-  const classes = useStyles();
-
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src="http://localhost:8000/camera_feed" alt="camera_feed" />
-        <Button
-          variant="contained"
-          color="primary"
-          size="large"
-          className={classes.button}
-          startIcon={<SaveIcon />}
-          onClick={handleSave}
-        >
-          Save
-      </Button>
-      </header>
-    </div>
-  );
+    return (
+        <div className={classes.root}>
+            <Grid container spacing={2} style={{ height: '100%' }}>
+                <Grid item xs={3}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                            <Paper className={classes.paper} >
+                                <Scanner />
+                            </Paper>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Paper className={classes.paper}>
+                                TODO: Folder structure
+                            </Paper>
+                        </Grid>
+                    </Grid>
+                </Grid>
+                <Grid item xs={9} className={classes.desktop}>
+                    <Desktop />
+                </Grid>
+            </Grid>
+        </div>
+    );
 }
-
-export default App;
