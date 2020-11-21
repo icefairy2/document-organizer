@@ -42,7 +42,6 @@ Deactivate: `deactivate`
 > **Note:** *venv* is the name of the virtual environment and can be something else. I advise you to call it *venv* to avoid accidentally pushing it to the repository, since only *env* and *venv* are ignored by git.
 
 ### Backend
-***I am not sure if this works yet, will fix in the future***
 ```
 pip install -r requirements.txt
 ```
@@ -60,6 +59,8 @@ To start the backend, go to folder *backend* and run:
 ```
 python manage.py runserver
 ```
+
+Create folder _scanned_documents_ under *document-organizer/backend*.
 
 ### Frontend
 Go to folder *frontend*.

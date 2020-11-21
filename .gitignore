@@ -1,6 +1,12 @@
 # Pycharm
 .idea/
 
+# VS Code
+.vscode/
+
+# Scanned documents folder
+scanned_documents/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
