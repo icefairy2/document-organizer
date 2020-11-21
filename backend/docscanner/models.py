@@ -6,7 +6,7 @@ from django.db import models
 
 class Document(models.Model):
     name = models.CharField(max_length=120)
-    filePath = models.FileField(upload_to='./test')
+    filePath = models.CharField(max_length=500)
 
     def _str_(self):
         return self.name
