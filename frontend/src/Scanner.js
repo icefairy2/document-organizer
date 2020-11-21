@@ -3,7 +3,6 @@ import './App.css';
 import Button from '@material-ui/core/Button';
 import SaveIcon from '@material-ui/icons/Save';
 import { makeStyles } from '@material-ui/core/styles';
-import { Card, CardContent, CardMedia } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   button: {
