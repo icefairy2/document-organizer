@@ -1,10 +1,5 @@
-import os
-
-from django.shortcuts import render
-
 # Create your views here.
-from django.shortcuts import render
-from rest_framework import viewsets
+import os
 import cv2
 from .serializers import DocumentSerializer
 from .models import Document
@@ -14,7 +9,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from docscanner.camera import VideoCamera
 from datetime import datetime
-import base64
+from rest_framework.response import Response
 
 from backend import settings
 
@@ -48,7 +43,15 @@ def document(request, file=''):
         db_document = Document(name=file_name, filePath=file_path)
         db_document.save()
 
-        return HttpResponse(status=status.HTTP_200_OK)
+        serializer = DocumentSerializer(data=db_document)
+        if serializer.is_valid():
+            serializer.save()
+            return HttpResponse(serializer.data, status=status.HTTP_200_OK)
+        return HttpResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        Document.objects.get(name=file).delete()
+        return Response(status=status.HTTP_200_OK)
 
 
 def gen():

@@ -5,7 +5,7 @@ from backend.docscanner import utils
 ########################################################################
 webCamFeed = True
 pathImage = "1.jpg"
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 cap.set(10, 160)
 heightImg = 480
 widthImg = 640
