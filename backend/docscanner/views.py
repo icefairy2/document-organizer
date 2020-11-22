@@ -37,10 +37,11 @@ def document(request, file=''):
         dt_string = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         file_name = 'doc_' + dt_string + '.jpg'
         file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+        file_date = dt_string
 
         cv2.imwrite(file_path, frame)
 
-        db_document = Document(name=file_name, filePath=file_path)
+        db_document = Document(name=file_name, filePath=file_path, scanningDate=file_date)
         db_document.save()
 
         serializer = DocumentSerializer(data=db_document)
