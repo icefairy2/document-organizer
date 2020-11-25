@@ -25,7 +25,8 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(0),
         backgroundColor: "#aeaeae",
         paddingRight: 0,
-        height: '100%'
+        height: '100%',
+        width: '100%',
     }
 }));
 
@@ -33,7 +34,7 @@ export default function CenteredGrid() {
     const classes = useStyles();
 
     return (
-        <Container maxWidth={false}>
+        <Container maxWidth={false} className={classes.root}>
             <Grid container spacing={2} style={{ height: '100%' }}>
                 <Grid item xs={3}>
                     <Grid container spacing={2}>
@@ -49,7 +50,7 @@ export default function CenteredGrid() {
                         </Grid>
                     </Grid>
                 </Grid>
-                <Grid item xs={9} className={classes.desktop}>
+                <Grid item xs={9} className={classes.desktop} overflow="visible">
                     <Desktop />
                 </Grid>
             </Grid>

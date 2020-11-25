@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Button, CardActionArea, CardMedia, makeStyles, CardActions, IconButton } from "@material-ui/core";
+import { Card, Button, CardActionArea, CardMedia, makeStyles, CardActions, IconButton, Grid, Container } from "@material-ui/core";
 import Draggable from "react-draggable";
 import RefreshIcon from '@material-ui/icons/Refresh';
 
@@ -39,14 +39,26 @@ export default function Desktop() {
     }
 
     return (
-        <div>
+        <Container maxWidth={false} style={{ height: '100%', overflow: 'auto' }}>
             <IconButton aria-label="refresh" onClick={handleRefresh}>
                 <RefreshIcon />
             </IconButton>
-            {imagePaths.map(path => (
-                <DraggableCard image={'http://localhost:8000/api/document/' + encodeURI(path)} />
-            ))}
-        </div>
+            <Grid
+                height="100%"
+                container
+                spacing={1}
+            >
+                {imagePaths.map(path => (
+
+                    <Grid
+                        item
+                        md={3}
+                    >
+                        <DraggableCard image={'http://localhost:8000/api/document/' + encodeURI(path)} />
+                    </Grid>
+                ))}
+            </Grid>
+        </Container>
     );
 }
 
@@ -62,7 +74,7 @@ const DraggableCard = ({ image }) => {
                     <CardMedia
                         className={classes.media}
                         image={image}
-                        title="Contemplative Reptile"
+                    // title="Contemplative Reptile"
                     />
                 </CardActionArea>
                 <CardActions>
