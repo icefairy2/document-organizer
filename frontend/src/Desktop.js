@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Card, Button, CardActionArea, CardMedia, makeStyles, CardActions, IconButton, Grid, Container } from "@material-ui/core";
+import { Card, Button, CardActionArea, CardMedia, makeStyles, CardActions, Grid, Container } from "@material-ui/core";
 import Draggable from "react-draggable";
-import RefreshIcon from '@material-ui/icons/Refresh';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -27,22 +26,23 @@ function getDocuments(setPaths) {
         });
 };
 
-export default function Desktop() {
+export default function Desktop(props) {
     const [imagePaths, setPaths] = useState([]);
-
-    useEffect(() => {
-        getDocuments(setPaths);
-    }, []);
 
     const handleRefresh = () => {
         getDocuments(setPaths);
     }
 
+    useEffect(() => {
+        handleRefresh();
+    }, []);
+
+    useEffect(() => {
+        handleRefresh();
+    }, [props.refresh]);
+
     return (
         <Container maxWidth={false} style={{ height: '100%', overflow: 'auto' }}>
-            <IconButton aria-label="refresh" onClick={handleRefresh}>
-                <RefreshIcon />
-            </IconButton>
             <Grid
                 height="100%"
                 container

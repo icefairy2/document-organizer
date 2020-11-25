@@ -43,11 +43,8 @@ def document(request, file=''):
         db_document = Document(name=file_name, filePath=file_path)
         db_document.save()
 
-        serializer = DocumentSerializer(data=db_document)
-        if serializer.is_valid():
-            serializer.save()
-            return HttpResponse(serializer.data, status=status.HTTP_200_OK)
-        return HttpResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = DocumentSerializer(db_document)
+        return HttpResponse(serializer.data, status=status.HTTP_200_OK)
 
     elif request.method == 'DELETE':
         Document.objects.get(name=file).delete()
