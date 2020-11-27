@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Button, CardActionArea, CardMedia, makeStyles, CardActions, Grid, Container } from "@material-ui/core";
+import { Card, Button, CardActionArea, CardMedia, makeStyles, CardActions, Grid, Container, Typography } from "@material-ui/core";
 import Draggable from "react-draggable";
 
 const useStyles = makeStyles((theme) => ({
@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function getDocuments(setPaths) {
+function getDocuments(setDocuments) {
     fetch('http://localhost:8000/api/documents/', {
         method: 'GET',
         headers: {
@@ -21,16 +21,15 @@ function getDocuments(setPaths) {
         }
     }).then(response => response.json())
         .then(data => {
-            const paths = data.map(doc => doc.filePath);
-            setPaths(paths);
+            setDocuments(data);
         });
 };
 
 export default function Desktop(props) {
-    const [imagePaths, setPaths] = useState([]);
+    const [documents, setDocuments] = useState([]);
 
     const handleRefresh = () => {
-        getDocuments(setPaths);
+        getDocuments(setDocuments);
     }
 
     useEffect(() => {
@@ -48,13 +47,16 @@ export default function Desktop(props) {
                 container
                 spacing={1}
             >
-                {imagePaths.map(path => (
-
+                {documents.map(document => (
                     <Grid
                         item
                         md={3}
                     >
-                        <DraggableCard image={'http://localhost:8000/api/document/' + encodeURI(path)} />
+                        <DraggableCard
+                            image={'http://localhost:8000/api/document/' + encodeURI(document.filePath)}
+                            name={document.name}
+                            id={document.id}
+                        />
                     </Grid>
                 ))}
             </Grid>
@@ -65,7 +67,7 @@ export default function Desktop(props) {
 /**
  * Material-UI Card that you can drag and drop anywhere.
  */
-const DraggableCard = ({ image }) => {
+const DraggableCard = ({ image, name }) => {
     const classes = useStyles();
     return (
         <Draggable>
@@ -76,6 +78,9 @@ const DraggableCard = ({ image }) => {
                         image={image}
                     // title="Contemplative Reptile"
                     />
+                    <Typography variant="overline">
+                        {name}
+                    </Typography>
                 </CardActionArea>
                 <CardActions>
                     <Button size="small" color="primary">
