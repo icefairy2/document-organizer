@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Card, Button, CardActionArea, CardMedia, makeStyles, CardActions, Grid, Container, Typography } from "@material-ui/core";
+import { Card, CardActionArea, CardMedia, makeStyles, Grid, Container, Typography } from "@material-ui/core";
 import Draggable from "react-draggable";
+import { ResizableBox } from "react-resizable";
+import "./Resizable.css";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        maxWidth: 240,
+        width: "100%",
+        height: "100%",
         margin: theme.spacing(1),
     },
     media: {
-        height: 140,
+        height: "100%",
+        width: "100%"
     },
 }));
 
@@ -25,6 +29,8 @@ function getDocuments(setDocuments) {
         });
 };
 
+
+
 export default function Desktop(props) {
     const [documents, setDocuments] = useState([]);
 
@@ -39,6 +45,7 @@ export default function Desktop(props) {
     useEffect(() => {
         handleRefresh();
     }, [props.refresh]);
+
 
     return (
         <Container maxWidth={false} style={{ height: '100%', overflow: 'auto' }}>
@@ -61,6 +68,7 @@ export default function Desktop(props) {
                 ))}
             </Grid>
         </Container>
+
     );
 }
 
@@ -69,25 +77,37 @@ export default function Desktop(props) {
  */
 const DraggableCard = ({ image, name }) => {
     const classes = useStyles();
+
+    const handleResizeStart = (e, { size }) => {
+        e.stopPropagation();
+    }
+
     return (
         <Draggable>
-            <Card className={classes.root}>
-                <CardActionArea>
-                    <CardMedia
-                        className={classes.media}
-                        image={image}
-                    // title="Contemplative Reptile"
-                    />
-                    <Typography variant="overline">
-                        {name}
-                    </Typography>
-                </CardActionArea>
-                <CardActions>
-                    <Button size="small" color="primary">
-                        Share
-                    </Button>
-                </CardActions>
-            </Card>
+            <div>
+                <ResizableBox
+                    width={240}
+                    height={200}
+                    minConstraints={[100, 100]}
+                    onResizeStart={handleResizeStart}
+                    draggableOpts={{ enableUserSelectHack: false }}
+                >
+
+                    <Card className={classes.root}>
+                        <CardActionArea className={classes.media}>
+                            <Typography variant="overline">
+                                {name}
+                            </Typography>
+
+                            <CardMedia
+                                className={classes.media}
+                                image={image}
+                            // title="Contemplative Reptile"
+                            />
+                        </CardActionArea>
+                    </Card>
+                </ResizableBox>
+            </div>
         </Draggable>
     );
 };
