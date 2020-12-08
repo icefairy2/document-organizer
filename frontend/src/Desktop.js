@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Card, CardActionArea, CardMedia, makeStyles, Grid, Container, Typography, Backdrop } from "@material-ui/core";
-import Draggable from "react-draggable";
-import { ResizableBox } from "react-resizable";
+import { makeStyles, Grid, Container } from "@material-ui/core";
 import "./Resizable.css";
+import DocumentCard from "./DocumentCard";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -63,7 +62,7 @@ export default function Desktop(props) {
                         item
                         md={3}
                     >
-                        <DraggableCard
+                        <DocumentCard
                             image={'http://localhost:8000/api/document/' + encodeURI(document.filePath)}
                             name={document.name}
                             id={document.id}
@@ -75,69 +74,3 @@ export default function Desktop(props) {
 
     );
 }
-
-/**
- * Material-UI Card that you can drag and drop anywhere.
- */
-const DraggableCard = ({ image, name }) => {
-    const classes = useStyles();
-    const [open, setOpen] = React.useState(false);
-    const [isDragging, setIsDragging] = React.useState(false);
-
-    const handleResizeStart = (e, { size }) => {
-        e.stopPropagation();
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
-    const handleToggle = () => {
-        setOpen(!open);
-    };
-
-    const handleDragStart = (e, data) => {
-        setIsDragging(true);
-    };
-
-    const handleDragStop = (e, data) => {
-        setTimeout(() => setIsDragging(false), 50);
-    };
-
-    return (
-        <React.Fragment>
-            <Draggable onDrag={handleDragStart} onStop={handleDragStop}>
-                <div>
-                    <ResizableBox
-                        width={240}
-                        height={200}
-                        minConstraints={[100, 100]}
-                        onResizeStart={handleResizeStart}
-                        draggableOpts={{ enableUserSelectHack: false }}
-                    >
-
-                        <Card className={classes.root}>
-                            <CardActionArea className={classes.media} onClick={() => {
-                                if (!isDragging) {
-                                    handleToggle();
-                                }
-                            }}>
-                                <Typography variant="overline">
-                                    {name}
-                                </Typography>
-
-                                <CardMedia
-                                    className={classes.media}
-                                    image={image}
-                                // title="Contemplative Reptile"
-                                />
-                            </CardActionArea>
-                        </Card>
-                    </ResizableBox>
-                </div>
-            </Draggable>
-            <Backdrop className={classes.backdrop} open={open} onClick={handleClose}>
-                <img src={image} alt={name} />
-            </Backdrop>
-        </React.Fragment>
-    );
-};
