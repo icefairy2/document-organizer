@@ -14,7 +14,6 @@ from rest_framework.response import Response
 from backend import settings
 
 camera = VideoCamera()
-file_names = dict()
 
 
 @api_view(['GET'])
@@ -32,40 +31,48 @@ def document(request, file=''):
         image_data = open(file, "rb").read()
         return HttpResponse(image_data, content_type="image/jpg")
 
-
     elif request.method == 'POST':
-
         frame = camera.get_cv_frame()
 
-        # dt_string = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-
-        number = file_names.get(file, 0)
-
-        file_names[file] = number + 1
-
-        file_name = 'doc_' + file + str(number) + '.jpg'
-
+        dt_string = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        file_name = 'doc_' + dt_string + '.jpg'
         file_path = os.path.join(settings.MEDIA_ROOT, file_name)
 
         cv2.imwrite(file_path, frame)
 
         db_document = Document(name=file_name, filePath=file_path)
-
         db_document.save()
 
-        serializer = DocumentSerializer(data=db_document)
-
-        if serializer.is_valid():
-            serializer.save()
-
-            return HttpResponse(serializer.data, status=status.HTTP_200_OK)
-
-        return HttpResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = DocumentSerializer(db_document)
+        return HttpResponse(serializer.data, status=status.HTTP_200_OK)
 
     elif request.method == 'DELETE':
         # TODO
         Document.objects.get(name=file).delete()
         return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def rename_document(request):
+    if request.method == 'POST':
+        doc_id = request.data['id']
+        file_name = request.data['new_name']
+
+        db_document = Document.objects.get(id=doc_id)
+
+        if db_document is None:
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+
+        old_file_path = db_document.filePath
+        file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+
+        os.rename(old_file_path, file_path)
+
+        db_document.name = file_name
+        db_document.filePath = file_path
+        db_document.save()
+
+        return HttpResponse(status=status.HTTP_200_OK)
 
 
 def gen():

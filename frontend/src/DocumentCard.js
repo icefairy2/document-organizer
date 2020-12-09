@@ -77,6 +77,28 @@ export default function DocumentCard({ image, name, id }) {
 
     const handleSave = () => {
         // TODO: Validate new name
+
+        fetch('http://localhost:8000/api/rename/', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                'id': id,
+                'new_name': modifiedName
+            })
+        }).then(response => {
+            if (response.ok) {
+                setIsEditingName(false);
+            }
+        });
+    }
+
+    const handleDialogSave = () => {
+        handleSave();
+        setAlertOpen(false);
+        setOpen(false);
     }
 
     const handleDiscard = () => {
@@ -168,7 +190,7 @@ export default function DocumentCard({ image, name, id }) {
                 </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleSave} color="primary">
+                    <Button onClick={handleDialogSave} color="primary">
                         Save
                     </Button>
                     <Button onClick={handleDiscard} color="primary" autoFocus>
