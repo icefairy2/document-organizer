@@ -1,4 +1,5 @@
 # Create your views here.
+import json
 import os
 import cv2
 from .serializers import DocumentSerializer
@@ -36,7 +37,7 @@ def all_documents_in_group(group):
     return documents
 
 #method to merge 2 documents
-def merge(doc1, doc2):
+def merge_docs(doc1, doc2):
     # case 1: doc 1 already in group, doc 2 already in a group -> merge 2 groups
     if doc1.group != -1:
         if doc2.group != -1:
@@ -50,10 +51,12 @@ def merge(doc1, doc2):
                 newOrder = nb_of_documents(doc1.group) + i
                 update_document(document, doc1.group, newOrder)
                 i += 1
+                return doc1.group
         # case 2: doc 1 already in group, doc 2 in no group -> add new doc to existing group
         elif doc2.group == -1:
             newOrder = nb_of_documents(doc1.group) + 1
             update_document(doc2, doc1.group, newOrder)
+            return doc1.group
     # case 3: the documents are not in a group -> create new group and add docs to group
     elif doc1.group == -1:
         if doc2.group == -1:
@@ -61,10 +64,12 @@ def merge(doc1, doc2):
             order = 0
             update_document(doc1, group, order)
             update_document(doc2, group, order+1)
+            return doc1.group
         # case 4: doc 2 in no group, doc 2 already in a group -> add new doc to existing group
         elif doc2.group != -1:
             newOrder = nb_of_documents(doc2.group) + 1
             update_document(doc1, doc2.group, newOrder)
+            return doc1.group
 
 @api_view(['GET'])
 def document_list(request):
@@ -124,7 +129,6 @@ def document(request, file=''):
 def group(request, name=''):
     if request.method == 'GET':
         group = Group.Object.get(name=name)
-        group = group
         documents = all_documents_in_group(group=group)
         documents_serializer = DocumentSerializer(documents, many=True)
         return JsonResponse(documents_serializer.data, safe=False)
@@ -158,6 +162,30 @@ def rename_document(request):
 
         return HttpResponse(status=status.HTTP_200_OK)
 
+
+@api_view(['POST'])
+def merge(request):
+    if request.method == 'POST':
+        body_unicode = request.body.decode('utf-8')
+        jsonObject = json.loads(body_unicode)
+
+        #to test we are getting the body correctly
+        for key in jsonObject:
+            value = jsonObject[key]
+            print("The key and value are ({}) = ({})".format(key, value))
+
+        docs = range(2)
+        for id in jsonObject:
+            doc = Document.Object.get(id=id)
+            docs.append(doc)
+
+        new_group = merge_docs(docs[0], docs[1])
+
+        serializer = GroupSerializer(data=new_group)
+        if serializer.is_valid():
+            serializer.save()
+            return HttpResponse(serializer.data, status=status.HTTP_200_OK)
+        return HttpResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def gen():
     while True:
