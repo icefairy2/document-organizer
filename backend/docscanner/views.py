@@ -63,6 +63,7 @@ def document(request, file=''):
         return HttpResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
+        # TODO
         Document.objects.get(name=file).delete()
         return Response(status=status.HTTP_200_OK)
 
