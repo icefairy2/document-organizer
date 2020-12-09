@@ -26,7 +26,8 @@ class Document(models.Model):
         Group,
         on_delete=models.CASCADE,
         related_name="document_group",
-        default=None
+        default=None,
+        null=True
     )
     order = models.PositiveIntegerField(default=0)
 

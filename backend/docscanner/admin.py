@@ -4,7 +4,7 @@ from .models import Document
 from .models import Group
 
 class DocumentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'filePath', 'groupId')
+    list_display = ('name', 'filePath', 'scanningDate', 'group')
 
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('name', 'docList')

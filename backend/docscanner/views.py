@@ -100,7 +100,7 @@ def document(request, file=''):
 
         cv2.imwrite(file_path, frame)
 
-        db_document = Document(name=file_name, filePath=file_path, scanningDate=file_date, groupId=file_group,
+        db_document = Document(name=file_name, filePath=file_path, scanningDate=file_date, group=file_group,
                                order=file_order)
         db_document.save()
 
@@ -126,8 +126,8 @@ def document(request, file=''):
 def group(request, name=''):
     if request.method == 'GET':
         group = Group.Object.get(name=name)
-        groupId = group.id
-        documents = all_documents_in_group(groupId=groupId)
+        group = group
+        documents = all_documents_in_group(group=group)
         documents_serializer = DocumentSerializer(documents, many=True)
         return JsonResponse(documents_serializer.data, safe=False)
         # for i in range(documents):

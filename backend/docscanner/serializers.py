@@ -5,7 +5,7 @@ from .models import Group
 class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
-        fields = ('id', 'name', 'filePath', 'scanningDate', 'groupId', 'order')
+        fields = ('id', 'name', 'filePath', 'scanningDate', 'group', 'order')
 
 
 class GroupSerializer(serializers.ModelSerializer):
