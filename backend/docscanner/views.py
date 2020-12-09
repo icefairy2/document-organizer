@@ -104,13 +104,11 @@ def document(request, file=''):
                                order=file_order)
         db_document.save()
 
-        serializer = DocumentSerializer(data=db_document)
-        if serializer.is_valid():
-            serializer.save()
-            return HttpResponse(serializer.data, status=status.HTTP_200_OK)
-        return HttpResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = DocumentSerializer(db_document)
+        return HttpResponse(serializer.data, status=status.HTTP_200_OK)
 
     elif request.method == 'DELETE':
+        # TODO
         Document.objects.get(name=file).delete()
         return Response(status=status.HTTP_200_OK)
     #method used to update a document with the new group details - TODO: find a better solution
@@ -137,6 +135,29 @@ def group(request, name=''):
     elif request.method == 'DELETE':
         Group.objects.get(name=name).delete()
         return Response(status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def rename_document(request):
+    if request.method == 'POST':
+        doc_id = request.data['id']
+        file_name = request.data['new_name']
+
+        db_document = Document.objects.get(id=doc_id)
+
+        if db_document is None:
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+
+        old_file_path = db_document.filePath
+        file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+
+        os.rename(old_file_path, file_path)
+
+        db_document.name = file_name
+        db_document.filePath = file_path
+        db_document.save()
+
+        return HttpResponse(status=status.HTTP_200_OK)
+
 
 def gen():
     while True:
