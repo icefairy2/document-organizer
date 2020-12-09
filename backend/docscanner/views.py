@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from backend import settings
 
 camera = VideoCamera()
+file_names = dict()
 
 
 @api_view(['GET'])
@@ -31,20 +32,35 @@ def document(request, file=''):
         image_data = open(file, "rb").read()
         return HttpResponse(image_data, content_type="image/jpg")
 
+
     elif request.method == 'POST':
+
         frame = camera.get_cv_frame()
 
-        dt_string = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_name = 'doc_' + dt_string + '.jpg'
+        # dt_string = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+        number = file_names.get(file, 0)
+
+        file_names[file] = number + 1
+
+        file_name = 'doc_' + file + str(number) + '.jpg'
+
         file_path = os.path.join(settings.MEDIA_ROOT, file_name)
 
         cv2.imwrite(file_path, frame)
 
         db_document = Document(name=file_name, filePath=file_path)
+
         db_document.save()
 
-        serializer = DocumentSerializer(db_document)
-        return HttpResponse(serializer.data, status=status.HTTP_200_OK)
+        serializer = DocumentSerializer(data=db_document)
+
+        if serializer.is_valid():
+            serializer.save()
+
+            return HttpResponse(serializer.data, status=status.HTTP_200_OK)
+
+        return HttpResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
         # TODO
