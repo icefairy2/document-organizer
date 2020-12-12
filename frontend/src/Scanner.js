@@ -17,18 +17,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function handleSave() {
-  fetch('http://localhost:8000/api/document/', {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({})
-  });
-};
-
-function Scanner() {
+function Scanner(props) {
   const classes = useStyles();
 
   return (
@@ -40,7 +29,7 @@ function Scanner() {
         size="large"
         className={classes.button}
         startIcon={<SaveIcon />}
-        onClick={handleSave}
+        onClick={props.handleSave}
       >
         Save
       </Button>

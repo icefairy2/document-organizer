@@ -1,19 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { Card, Button, CardActionArea, CardMedia, makeStyles, CardActions, IconButton } from "@material-ui/core";
-import Draggable from "react-draggable";
-import RefreshIcon from '@material-ui/icons/Refresh';
+import { makeStyles, Grid, Container } from "@material-ui/core";
+import "./Resizable.css";
+import DocumentCard from "./DocumentCard";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        maxWidth: 240,
+        width: "100%",
+        height: "100%",
         margin: theme.spacing(1),
     },
     media: {
-        height: 140,
+        height: "100%",
+        width: "100%"
+    },
+    backdrop: {
+        zIndex: theme.zIndex.drawer + 1,
+        color: '#fff',
     },
 }));
 
-function getDocuments(setPaths) {
+function getDocuments(setDocuments) {
     fetch('http://localhost:8000/api/documents/', {
         method: 'GET',
         headers: {
@@ -22,55 +28,49 @@ function getDocuments(setPaths) {
         }
     }).then(response => response.json())
         .then(data => {
-            const paths = data.map(doc => doc.filePath);
-            setPaths(paths);
+            setDocuments(data);
         });
 };
 
-export default function Desktop() {
-    const [imagePaths, setPaths] = useState([]);
 
-    useEffect(() => {
-        getDocuments(setPaths);
-    }, []);
+
+export default function Desktop(props) {
+    const [documents, setDocuments] = useState([]);
 
     const handleRefresh = () => {
-        getDocuments(setPaths);
+        getDocuments(setDocuments);
     }
 
+    useEffect(() => {
+        handleRefresh();
+    }, []);
+
+    useEffect(() => {
+        handleRefresh();
+    }, [props.refresh]);
+
+
     return (
-        <div>
-            <IconButton aria-label="refresh" onClick={handleRefresh}>
-                <RefreshIcon />
-            </IconButton>
-            {imagePaths.map(path => (
-                <DraggableCard image={'http://localhost:8000/api/document/' + encodeURI(path)} />
-            ))}
-        </div>
+        <Container maxWidth={false} style={{ height: '100%', overflow: 'auto' }}>
+            <Grid
+                height="100%"
+                container
+                spacing={1}
+            >
+                {documents.map(document => (
+                    <Grid
+                        item
+                        md={3}
+                    >
+                        <DocumentCard
+                            image={'http://localhost:8000/api/document/' + encodeURI(document.filePath)}
+                            name={document.name}
+                            id={document.id}
+                        />
+                    </Grid>
+                ))}
+            </Grid>
+        </Container>
+
     );
 }
-
-/**
- * Material-UI Card that you can drag and drop anywhere.
- */
-const DraggableCard = ({ image }) => {
-    const classes = useStyles();
-    return (
-        <Draggable>
-            <Card className={classes.root}>
-                <CardActionArea>
-                    <CardMedia
-                        className={classes.media}
-                        image={image}
-                        title="Contemplative Reptile"
-                    />
-                </CardActionArea>
-                <CardActions>
-                    <Button size="small" color="primary">
-                        Share
-                    </Button>
-                </CardActions>
-            </Card>
-        </Draggable>
-    );
-};

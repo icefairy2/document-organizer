@@ -22,5 +22,6 @@ urlpatterns = [
     path('api/documents/', views.document_list),
     path('api/document/', views.document),
     path('api/document/<str:file>/', views.document),
+    path('api/rename/', views.rename_document),
     path('camera_feed', views.camera_feed),
 ]
