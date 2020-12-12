@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path #, re_path
+from django.urls import path
 from docscanner import views
 # from channels.routing import ProtocolTypeRouter, URLRouter
 # from docscanner import consumer
@@ -25,6 +25,9 @@ urlpatterns = [
     path('api/document/', views.document),
     path('api/document/<str:file>/', views.document),
     path('api/rename/', views.rename_document),
+    path('api/groups/', views.groups_list),
+    path('api/group/', views.group),
+    path('api/group/<int:group_id>/', views.group),
     path('camera_feed', views.camera_feed),
 ]
 
