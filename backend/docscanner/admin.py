@@ -5,11 +5,11 @@ from .models import Group
 
 
 class DocumentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'filePath', 'scanningDate', 'group')
+    list_display = ('id', 'name', 'filePath', 'scanningDate', 'group')
 
 
 class GroupAdmin(admin.ModelAdmin):
-    list_display = ('name', 'docList')
+    list_display = ('id', 'name')
 
 
 # Register your models here.

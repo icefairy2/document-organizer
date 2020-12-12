@@ -6,7 +6,6 @@ from django.utils import timezone
 
 class Group(models.Model):
     name = models.CharField(max_length=120)
-    docList = models.CharField(max_length=120)
 
     def _str_(self):
         return self.name

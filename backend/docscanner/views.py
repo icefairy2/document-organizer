@@ -20,20 +20,20 @@ camera = VideoCamera()
 
 
 # method to get the number of documents in a group
-def nb_of_documents(group):
-    return len(all_documents_in_group(group))
+def nb_of_documents(group_id):
+    return len(all_documents_in_group(group_id))
 
 
 # method to update the document on merging
-def update_document(document, group, order):
-    document.group = group
-    document.order = order
-    document.save()
+def update_document(db_document, group_id, order):
+    db_document.group = group_id
+    db_document.order = order
+    db_document.save()
 
 
 # method to get a list of documents in a group
-def all_documents_in_group(group):
-    documents = Document.objects.all().filter(group=group)
+def all_documents_in_group(group_id):
+    documents = Document.objects.all().filter(group=group_id)
 
     # documents_serializer = DocumentSerializer(documents, many=True)
     # return JsonResponse(documents_serializer.data, safe=False)
@@ -43,8 +43,8 @@ def all_documents_in_group(group):
 # method to merge 2 documents
 def merge_docs(doc1, doc2):
     # case 1: doc 1 already in group, doc 2 already in a group -> merge 2 groups
-    if doc1.group != -1:
-        if doc2.group != -1:
+    if doc1.group is not None:
+        if doc2.group is not None:
             oldGroup = doc2.group
             newOrder = nb_of_documents(doc1.group) + 1
             update_document(doc2, doc1.group, newOrder)
@@ -57,14 +57,16 @@ def merge_docs(doc1, doc2):
                 i += 1
                 return doc1.group
         # case 2: doc 1 already in group, doc 2 in no group -> add new doc to existing group
-        elif doc2.group == -1:
+        elif doc2.group is None:
             newOrder = nb_of_documents(doc1.group) + 1
             update_document(doc2, doc1.group, newOrder)
             return doc1.group
     # case 3: the documents are not in a group -> create new group and add docs to group
-    elif doc1.group == -1:
-        if doc2.group == -1:
-            group = Group.create("new group")
+    elif doc1.group is None:
+        if doc2.group is None:
+            group = Group(name=doc1.name)
+            group.save()
+
             order = 0
             update_document(doc1, group, order)
             update_document(doc2, group, order + 1)
@@ -93,7 +95,7 @@ def groups_list(request):
         return JsonResponse(groups_serializer.data, safe=False)
 
 
-@api_view(['GET', 'POST', 'PATCH'])
+@api_view(['GET', 'POST'])
 def document(request, file=''):
     if request.method == 'GET':
         image_data = open(file, "rb").read()
@@ -122,27 +124,36 @@ def document(request, file=''):
         # TODO
         Document.objects.get(name=file).delete()
         return Response(status=status.HTTP_200_OK)
-    # method used to update a document with the new group details - TODO: find a better solution
-    elif request.method == 'PATCH':
-        serializer = DocumentSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return HttpResponse(serializer.data, status=status.HTTP_200_OK)
-        return HttpResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET', 'POST'])
-def group(request, name=''):
+def group(request, group_id=''):
     if request.method == 'GET':
-        group = Group.Object.get(name=name)
-        documents = all_documents_in_group(group=group)
+        group = Group.objects.get(id=group_id)
+        documents = all_documents_in_group(group_id=group)
         documents_serializer = DocumentSerializer(documents, many=True)
         return JsonResponse(documents_serializer.data, safe=False)
-        # for i in range(documents):
-        #     image_data = open(i, "rb").read()
-        #     return HttpResponse(image_data, content_type="image/jpg")
+
+    elif request.method == 'POST':
+        doc1_id = request.data['doc1_id']
+        doc2_id = request.data['doc2_id']
+
+        db_document1 = Document.objects.get(id=doc1_id)
+
+        if db_document1 is None:
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+
+        db_document2 = Document.objects.get(id=doc2_id)
+
+        if db_document2 is None:
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+
+        merge_docs(db_document1, db_document2)
+
+        return HttpResponse(status=status.HTTP_200_OK)
 
     elif request.method == 'DELETE':
+        # TODO
         Group.objects.get(name=name).delete()
         return Response(status=status.HTTP_200_OK)
 
@@ -168,31 +179,6 @@ def rename_document(request):
         db_document.save()
 
         return HttpResponse(status=status.HTTP_200_OK)
-
-
-@api_view(['POST'])
-def merge(request):
-    if request.method == 'POST':
-        body_unicode = request.body.decode('utf-8')
-        jsonObject = json.loads(body_unicode)
-
-        # to test we are getting the body correctly
-        for key in jsonObject:
-            value = jsonObject[key]
-            print("The key and value are ({}) = ({})".format(key, value))
-
-        docs = range(2)
-        for id in jsonObject:
-            doc = Document.Object.get(id=id)
-            docs.append(doc)
-
-        new_group = merge_docs(docs[0], docs[1])
-
-        serializer = GroupSerializer(data=new_group)
-        if serializer.is_valid():
-            serializer.save()
-            return HttpResponse(serializer.data, status=status.HTTP_200_OK)
-        return HttpResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 def gen():
