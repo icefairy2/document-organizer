@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Document
 from .models import Group
 
+
 class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document

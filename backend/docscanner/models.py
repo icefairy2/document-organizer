@@ -1,6 +1,5 @@
 from django.db import models
 
-
 # Create your models here.
 from django.utils import timezone
 
@@ -8,6 +7,7 @@ from django.utils import timezone
 class Group(models.Model):
     name = models.CharField(max_length=120)
     docList = models.CharField(max_length=120)
+
     def _str_(self):
         return self.name
 
@@ -15,7 +15,6 @@ class Group(models.Model):
     def create(cls, name):
         group = cls(name=name)
         return group
-
 
 
 class Document(models.Model):

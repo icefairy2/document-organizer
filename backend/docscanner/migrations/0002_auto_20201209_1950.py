@@ -6,7 +6,6 @@ import django.utils.timezone
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('docscanner', '0001_initial'),
     ]
@@ -38,6 +37,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='document',
             name='group',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='document_group', to='docscanner.group'),
+            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='document_group', to='docscanner.group'),
         ),
     ]

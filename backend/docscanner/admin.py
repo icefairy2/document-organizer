@@ -3,11 +3,14 @@ from django.contrib import admin
 from .models import Document
 from .models import Group
 
+
 class DocumentAdmin(admin.ModelAdmin):
     list_display = ('name', 'filePath', 'scanningDate', 'group')
 
+
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('name', 'docList')
+
 
 # Register your models here.
 admin.site.register(Document, DocumentAdmin)

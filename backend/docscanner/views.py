@@ -10,7 +10,7 @@ from django.http.response import StreamingHttpResponse, HttpResponse
 from django.http.response import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
-from docscanner.camera import VideoCamera
+from .camera import VideoCamera
 from datetime import datetime
 from rest_framework.response import Response
 
@@ -18,17 +18,20 @@ from backend import settings
 
 camera = VideoCamera()
 
-#method to get the number of documents in a group
+
+# method to get the number of documents in a group
 def nb_of_documents(group):
     return len(all_documents_in_group(group))
 
-#method to update the document on merging
+
+# method to update the document on merging
 def update_document(document, group, order):
     document.group = group
     document.order = order
     document.save()
 
-#method to get a list of documents in a group
+
+# method to get a list of documents in a group
 def all_documents_in_group(group):
     documents = Document.objects.all().filter(group=group)
 
@@ -36,7 +39,8 @@ def all_documents_in_group(group):
     # return JsonResponse(documents_serializer.data, safe=False)
     return documents
 
-#method to merge 2 documents
+
+# method to merge 2 documents
 def merge_docs(doc1, doc2):
     # case 1: doc 1 already in group, doc 2 already in a group -> merge 2 groups
     if doc1.group != -1:
@@ -63,7 +67,7 @@ def merge_docs(doc1, doc2):
             group = Group.create("new group")
             order = 0
             update_document(doc1, group, order)
-            update_document(doc2, group, order+1)
+            update_document(doc2, group, order + 1)
             return doc1.group
         # case 4: doc 2 in no group, doc 2 already in a group -> add new doc to existing group
         elif doc2.group != -1:
@@ -71,12 +75,14 @@ def merge_docs(doc1, doc2):
             update_document(doc1, doc2.group, newOrder)
             return doc1.group
 
+
 @api_view(['GET'])
 def document_list(request):
     if request.method == 'GET':
         documents = Document.objects.all()
         documents_serializer = DocumentSerializer(documents, many=True)
         return JsonResponse(documents_serializer.data, safe=False)
+
 
 @api_view(['GET'])
 def groups_list(request):
@@ -116,7 +122,7 @@ def document(request, file=''):
         # TODO
         Document.objects.get(name=file).delete()
         return Response(status=status.HTTP_200_OK)
-    #method used to update a document with the new group details - TODO: find a better solution
+    # method used to update a document with the new group details - TODO: find a better solution
     elif request.method == 'PATCH':
         serializer = DocumentSerializer(data=request.data)
         if serializer.is_valid():
@@ -139,6 +145,7 @@ def group(request, name=''):
     elif request.method == 'DELETE':
         Group.objects.get(name=name).delete()
         return Response(status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 def rename_document(request):
@@ -169,7 +176,7 @@ def merge(request):
         body_unicode = request.body.decode('utf-8')
         jsonObject = json.loads(body_unicode)
 
-        #to test we are getting the body correctly
+        # to test we are getting the body correctly
         for key in jsonObject:
             value = jsonObject[key]
             print("The key and value are ({}) = ({})".format(key, value))
@@ -186,6 +193,7 @@ def merge(request):
             serializer.save()
             return HttpResponse(serializer.data, status=status.HTTP_200_OK)
         return HttpResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 def gen():
     while True:
