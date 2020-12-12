@@ -14,7 +14,7 @@ from docscanner import utils
 
 
 class VideoCamera(object):
-    def __init__(self, interactive=True, MIN_QUAD_AREA_RATIO=0.25, MAX_QUAD_ANGLE_RANGE=40):
+    def __init__(self, interactive=False, MIN_QUAD_AREA_RATIO=0.25, MAX_QUAD_ANGLE_RANGE=40):
 
         self.video = cv2.VideoCapture(0)
         self.interactive = interactive
@@ -281,11 +281,16 @@ class VideoCamera(object):
         gray = cv2.cvtColor(warped, cv2.COLOR_BGR2GRAY)
 
         # sharpen img
-        sharpen = cv2.GaussianBlur(gray, (0, 0), 3)
-        sharpen = cv2.addWeighted(gray, 1.5, sharpen, -0.5, 0)
+        sharpen = cv2.GaussianBlur(gray, (0, 0), 3)  # (0, 0), 3)
+        # cv2.imshow('sharpen', sharpen)
+        # cv2.waitKey(0)
+        sharpen = cv2.addWeighted(gray, 2.5, sharpen, -0.5, 0)
+        # cv2.imshow('sharpen', gray)
+        # cv2.waitKey(0)
 
         # apply adaptive thrs to get black and white effect
-        thresh = cv2.adaptiveThreshold(sharpen, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 27, 15) #initially 21, 15
+        thresh = cv2.adaptiveThreshold(sharpen, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21,
+                                       15)  # initially 21, 15
         self.get_text(thresh)
         # return the transformed img
         return thresh

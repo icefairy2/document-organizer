@@ -34,7 +34,7 @@ def document(request, file=''):
     elif request.method == 'POST':
         frame = camera.get_cv_frame()
 
-        dt_string = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        dt_string = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         file_name = 'doc_' + dt_string + '.jpg'
         file_path = os.path.join(settings.MEDIA_ROOT, file_name)
         file_date = dt_string
@@ -79,12 +79,22 @@ def rename_document(request):
 def gen():
     while True:
         frame = camera.get_cv_frame()
+        if frame is None:
+            continue
+
         ret, jpeg = cv2.imencode('.jpg', frame)
-        encoded_frame = jpeg.tobytes()
+        if not ret:
+            continue
+
+        #encoded_frame = jpeg.tobytes()
+
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + encoded_frame + b'\r\n\r\n')
+               b'Content-Type: image/jpeg\r\n\r\n' + bytearray(jpeg) + b'\r\n\r\n')
 
 
-def camera_feed(request):
-    return StreamingHttpResponse(gen(),
-                                 content_type='multipart/x-mixed-replace; boundary=frame')
+# def camera_feed(request):
+#     return StreamingHttpResponse(gen(),
+#                                  content_type='multipart/x-mixed-replace; boundary=frame')
+@api_view(['GET'])
+def camera_feed(self):
+    return Response(gen(), content_type='multipart/x-mixed-replace; boundary=frame')

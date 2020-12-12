@@ -14,8 +14,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path #, re_path
 from docscanner import views
+# from channels.routing import ProtocolTypeRouter, URLRouter
+# from docscanner import consumer
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,3 +27,8 @@ urlpatterns = [
     path('api/rename/', views.rename_document),
     path('camera_feed', views.camera_feed),
 ]
+
+#
+# websockets = URLRouter([
+#     path("ws/live-video/", consumer.LiveVideoFeedConsumer.as_asgi(), name="live-video"),
+# ])
