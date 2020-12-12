@@ -23,5 +23,8 @@ urlpatterns = [
     path('api/document/', views.document),
     path('api/document/<str:file>/', views.document),
     path('api/rename/', views.rename_document),
+    path('api/groups/', views.groups_list),
+    path('api/group/', views.group),
+    path('api/group/<int:group_id>/', views.group),
     path('camera_feed', views.camera_feed),
 ]
