@@ -22,7 +22,7 @@ function Scanner(props) {
 
   return (
     <React.Fragment>
-      <img src="http://localhost:8000/camera_feed" width="100%" alt="camera_feed" />
+      <img src="http://localhost:8000/camera_feed" width="100%" alt="camera_feed" style={{ paddingTop: 16 }} />
       <Button
         variant="contained"
         color="primary"
