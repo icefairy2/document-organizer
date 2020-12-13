@@ -38,8 +38,8 @@ function getDocuments(setDocuments, setDocumentsPositions, documentCount, setDoc
                 i++;
             }
             setDocumentCount(i);
-            setDocumentsPositions(positions);       
-            setIsLoading(false); 
+            setDocumentsPositions(positions);
+            setIsLoading(false);
         });
 };
 
@@ -68,9 +68,9 @@ export default function Desktop(props) {
     {
         return (
             <Container maxWidth={false} style={{ height: '100%', overflow: 'auto' }}>
-         
+
                     {documents.map(document => (
-                    
+
                             <DocumentCard
                                 image={'http://localhost:8000/api/document/' + encodeURI(document.filePath)}
                                 name={document.name}
@@ -80,10 +80,10 @@ export default function Desktop(props) {
                                 positions={documentsPositions}
                                 setDocumentsPositions={setDocumentsPositions}
                             />
-                    
+
                     ))}
 
-          
+
         </Container>
         );
     }
