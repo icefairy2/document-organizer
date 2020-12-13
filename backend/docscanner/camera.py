@@ -14,7 +14,7 @@ from docscanner import utils
 
 
 class VideoCamera(object):
-    def __init__(self, interactive=False, MIN_QUAD_AREA_RATIO=0.25, MAX_QUAD_ANGLE_RANGE=40):
+    def __init__(self, interactive=True, MIN_QUAD_AREA_RATIO=0.25, MAX_QUAD_ANGLE_RANGE=40):
 
         self.video = cv2.VideoCapture(0)
         self.interactive = interactive

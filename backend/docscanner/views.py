@@ -102,20 +102,35 @@ def document(request, file=''):
         return HttpResponse(image_data, content_type="image/jpg")
 
     elif request.method == 'POST':
+
         frame = camera.get_cv_frame()
 
-        dt_string = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        file_name = 'doc_' + dt_string + '.jpg'
-        file_path = os.path.join(settings.MEDIA_ROOT, file_name)
-        file_date = dt_string
-        file_group = -1
-        file_order = -1
+        #directory = r'C:\Users\Alexandra Dobre\Documents\Master\An II\NGUI\document-organizer\backend\scanned-documents'
 
-        cv2.imwrite(file_path, frame)
+        dt_string = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
+        file_name = 'doc_' + dt_string + '.jpg'
+        file_path = os.path.join(os.getcwd(), file_name)
+
+        #file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+        file_date = datetime.now()
+        file_group = None
+        file_order = 0
+        print(os.getcwd())
+
+        cv2.imshow("frame", frame)
+        cv2.waitKey(0)
+
+        if not cv2.imwrite(file_path, frame):
+            raise Exception("could not write image")
+
+        #cv2.imwrite(file_path, frame)
+        print("file path is ", file_path)
 
         db_document = Document(name=file_name, filePath=file_path, scanningDate=file_date, group=file_group,
                                order=file_order)
+
         db_document.save()
+
 
         serializer = DocumentSerializer(db_document)
         return HttpResponse(serializer.data, status=status.HTTP_200_OK)
@@ -197,9 +212,9 @@ def gen():
                b'Content-Type: image/jpeg\r\n\r\n' + bytearray(jpeg) + b'\r\n\r\n')
 
 
-# def camera_feed(request):
-#     return StreamingHttpResponse(gen(),
-#                                  content_type='multipart/x-mixed-replace; boundary=frame')
-@api_view(['GET'])
-def camera_feed(self):
-    return Response(gen(), content_type='multipart/x-mixed-replace; boundary=frame')
+def camera_feed(request):
+    return StreamingHttpResponse(gen(),
+                                 content_type='multipart/x-mixed-replace; boundary=frame')
+# @api_view(['GET'])
+# def camera_feed(self):
+#     return Response(gen(), content_type='multipart/x-mixed-replace; boundary=frame')

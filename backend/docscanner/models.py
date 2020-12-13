@@ -1,3 +1,7 @@
+import os
+from datetime import datetime
+
+
 from django.db import models
 
 # Create your models here.
@@ -15,11 +19,13 @@ class Group(models.Model):
         group = cls(name=name)
         return group
 
+def upload_document_path(instance, filename):
+    return os.path.join('/scanned_documents/', instance.document_id, filename)
 
 class Document(models.Model):
     name = models.CharField(max_length=120)
     filePath = models.CharField(max_length=500)
-    scanningDate = models.DateTimeField(default=timezone.now)
+    scanningDate = models.DateTimeField(default=datetime.now())
     group = models.ForeignKey(
         Group,
         on_delete=models.CASCADE,

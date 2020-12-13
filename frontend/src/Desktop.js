@@ -63,7 +63,7 @@ export default function Desktop(props) {
                         md={3}
                     >
                         <DocumentCard
-                            image={'http://localhost:8000/api/document/' + encodeURI(document.filePath)}
+                            image={'http://localhost:8000/api/document/' + encodeURI(document.id)}
                             name={document.name}
                             id={document.id}
                         />
