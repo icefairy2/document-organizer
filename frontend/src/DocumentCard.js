@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Card, CardActionArea, CardMedia, makeStyles, Typography, Backdrop, InputBase, IconButton, Dialog, DialogContentText } from "@material-ui/core";
 import { Rnd } from "react-rnd";
 import { ResizableBox } from "react-resizable";
@@ -9,6 +9,8 @@ import Button from '@material-ui/core/Button';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -81,7 +83,9 @@ export default function DocumentCard({ documents, id, name, nrPages, zIndexVar, 
     const [isEditingName, setIsEditingName] = React.useState(false);
     const [modifiedName, setModifiedName] = React.useState(name);
     const [zIndexLocal, setZIndexLocal] = React.useState(1);
-    const image = 'http://localhost:8000/api/document/' + documents[0].id.toString();
+
+    const [image, setImage] = React.useState('http://localhost:8000/api/document/' + documents[0].id.toString());
+    const [imageIndex, setImageIndex] = React.useState(0);
 
     const [gr1Name, setGr1Name] = React.useState('');
     const [gr2Name, setGr2Name] = React.useState('');
@@ -90,6 +94,10 @@ export default function DocumentCard({ documents, id, name, nrPages, zIndexVar, 
     const [gr2Id, setGr2Id] = React.useState(-1);
 
     const [openBar, setOpenBar] = React.useState(false);
+
+    useEffect(() => {
+        setImage('http://localhost:8000/api/document/' + documents[imageIndex].id.toString())
+    }, [imageIndex, documents]);
 
     const handleClickBar = (gr1_id, gr2_id) => {
         setGr1Id(gr1_id);
@@ -180,13 +188,14 @@ export default function DocumentCard({ documents, id, name, nrPages, zIndexVar, 
             })
         }).then(response => {
             if (response.ok) {
+                handleRefresh();
                 setIsEditingName(false);
             }
         });
     }
 
     const handleDialogSave = () => {
-        handleSave();
+        handleSave(handleRefresh);
         setAlertOpen(false);
         setOpen(false);
     }
@@ -196,6 +205,14 @@ export default function DocumentCard({ documents, id, name, nrPages, zIndexVar, 
         setIsEditingName(false);
         setAlertOpen(false);
         setOpen(false);
+    }
+
+    const handleNext = () => {
+        setImageIndex(imageIndex + 1);
+    }
+
+    const handlePrev = () => {
+        setImageIndex(imageIndex - 1);
     }
 
     return (
@@ -263,6 +280,31 @@ export default function DocumentCard({ documents, id, name, nrPages, zIndexVar, 
                         }
                     </div>
                     <img src={image} alt={name} />
+                    <div style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                        <IconButton
+                            style={{ color: 'white' }}
+                            disabled={imageIndex === 0}
+                            onClick={handlePrev}
+                        >
+                            <ArrowBackIosIcon fontSize="large" />
+                        </IconButton>
+                        <IconButton
+                            style={{ color: 'white' }}
+                            disabled={imageIndex === documents.length - 1}
+                            onClick={handleNext}
+                        >
+                            <ArrowForwardIosIcon fontSize="large" />
+                        </IconButton>
+                    </div>
+                    <Button
+                        style={{ color: 'white', borderColor: "white", }}
+                        variant="outlined"
+                        size="large"
+                    // className={classes.button}
+                    // onClick={props.handleSave}
+                    >
+                        Remove from group
+                    </Button>
                 </div>
                 <IconButton
                     style={{

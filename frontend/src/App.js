@@ -120,7 +120,7 @@ export default function App() {
                     </Grid>
                     <Grid item className={classes.searchSection}>
                         <Paper className={classes.paper} style={{ height: 'calc(100% - 16px)' }}>
-                            <Search documents={filteredGroups} setFilterTerm={setFilterTerm} />
+                            <Search groups={filteredGroups} setFilterTerm={setFilterTerm} />
                         </Paper>
                     </Grid>
                 </Grid>

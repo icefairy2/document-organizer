@@ -26,13 +26,13 @@ function Search(props) {
                 onCancelSearch={() => props.setFilterTerm('')}
             />
             <List dense={true} className={classes.root}>
-                {props.documents.map(document => (
+                {props.groups.map(group => (
                     <ListItem button>
                         <ListItemIcon>
                             <DescriptionIcon />
                         </ListItemIcon>
                         <ListItemText
-                            primary={document.name}
+                            primary={group.name + '(' + group.nrPages + ')'}
                         />
                     </ListItem>
                 ))}
