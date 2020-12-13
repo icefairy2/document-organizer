@@ -27,28 +27,25 @@ def update_document(db_document, group_id, order):
 
 
 # method to get a list of documents in a group
-def all_documents_in_group(group_id):
-    documents = Document.objects.all().filter(group=group_id).order_by('order')
+def all_documents_in_group(db_group):
+    documents = Document.objects.all().filter(group=db_group).order_by('order')
     return documents
 
 
 # method to merge 2 documents
-def merge_docs(doc1, doc2):
-    # case 1: doc 1 already in group, doc 2 already in a group -> merge 2 groups
-    new_group = doc1.group
-    if new_group is not None:
-        if doc2.group is not None:
-            old_group = doc2.group
-            related_documents = all_documents_in_group(old_group)
-            i = 0
-            for db_document in related_documents:
-                db_document.group = new_group
-                new_order = new_group.nrPages + i
-                update_document(db_document, new_group, new_order)
-                i += 1
-            new_group.nrPages += i
-            new_group.save()
-            return new_group
+def merge_docs(group1, group2):
+    related_documents2 = all_documents_in_group(group2)
+
+    i = 0
+    for doc2 in related_documents2:
+        new_order = group1.nrPages + i
+        update_document(doc2, group1, new_order)
+        i += 1
+    group1.nrPages += i
+    group1.save()
+
+    group2.delete()
+    return group1
 
 
 @api_view(['GET'])
@@ -65,7 +62,14 @@ def groups_list(request):
         groups = Group.objects.all()
 
         groups_serializer = GroupSerializer(groups, many=True)
-        return JsonResponse(groups_serializer.data, safe=False)
+        group_json = groups_serializer.data
+
+        for gr in group_json:
+            related_documents = all_documents_in_group(Group.objects.get(id=gr['id']))
+            documents_serializer = DocumentSerializer(related_documents, many=True)
+            gr['documents'] = documents_serializer.data
+
+        return JsonResponse(group_json, safe=False)
 
 
 @api_view(['GET', 'POST'])
@@ -103,26 +107,32 @@ def document(request, file_id=''):
 @api_view(['GET', 'POST'])
 def group(request, group_id=''):
     if request.method == 'GET':
-        group = Group.objects.get(id=group_id)
-        documents = all_documents_in_group(group_id=group)
-        documents_serializer = DocumentSerializer(documents, many=True)
-        return JsonResponse(documents_serializer.data, safe=False)
+        db_group = Group.objects.get(id=group_id)
+
+        groups_serializer = GroupSerializer(db_group)
+        group_json = groups_serializer.data
+
+        related_documents = all_documents_in_group(db_group)
+        documents_serializer = DocumentSerializer(related_documents, many=True)
+        group_json['documents'] = documents_serializer.data
+
+        return JsonResponse(group_json, safe=False)
 
     elif request.method == 'POST':
         doc1_id = request.data['doc1_id']
         doc2_id = request.data['doc2_id']
 
-        db_document1 = Document.objects.get(id=doc1_id)
+        db_group1 = Group.objects.get(id=doc1_id)
 
-        if db_document1 is None:
+        if db_group1 is None:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
 
-        db_document2 = Document.objects.get(id=doc2_id)
+        db_group2 = Group.objects.get(id=doc2_id)
 
-        if db_document2 is None:
+        if db_group2 is None:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
 
-        merge_docs(db_document1, db_document2)
+        merge_docs(db_group1, db_group2)
 
         return HttpResponse(status=status.HTTP_200_OK)
 
