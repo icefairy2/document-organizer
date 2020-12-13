@@ -1,23 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles, Grid, Container } from "@material-ui/core";
+import { Grid, Container } from "@material-ui/core";
 import "./Resizable.css";
 import DocumentCard from "./DocumentCard";
-
-const useStyles = makeStyles((theme) => ({
-    root: {
-        width: "100%",
-        height: "100%",
-        margin: theme.spacing(1),
-    },
-    media: {
-        height: "100%",
-        width: "100%"
-    },
-    backdrop: {
-        zIndex: theme.zIndex.drawer + 1,
-        color: '#fff',
-    },
-}));
 
 function getDocuments(setDocuments) {
     fetch('http://localhost:8000/api/documents/', {
@@ -31,8 +15,6 @@ function getDocuments(setDocuments) {
             setDocuments(data);
         });
 };
-
-
 
 export default function Desktop(props) {
     const [documents, setDocuments] = useState([]);
