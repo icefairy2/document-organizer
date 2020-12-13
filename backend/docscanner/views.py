@@ -19,11 +19,6 @@ from backend import settings
 camera = VideoCamera()
 
 
-# method to get the number of documents in a group
-def nb_of_documents(group_id):
-    return len(all_documents_in_group(group_id))
-
-
 # method to update the document on merging
 def update_document(db_document, group_id, order):
     db_document.group = group_id
@@ -33,49 +28,28 @@ def update_document(db_document, group_id, order):
 
 # method to get a list of documents in a group
 def all_documents_in_group(group_id):
-    documents = Document.objects.all().filter(group=group_id)
-
-    # documents_serializer = DocumentSerializer(documents, many=True)
-    # return JsonResponse(documents_serializer.data, safe=False)
+    documents = Document.objects.all().filter(group=group_id).order_by('order')
     return documents
 
 
 # method to merge 2 documents
 def merge_docs(doc1, doc2):
     # case 1: doc 1 already in group, doc 2 already in a group -> merge 2 groups
-    if doc1.group is not None:
+    new_group = doc1.group
+    if new_group is not None:
         if doc2.group is not None:
-            oldGroup = doc2.group
-            newOrder = nb_of_documents(doc1.group) + 1
-            update_document(doc2, doc1.group, newOrder)
-            relatedDocuments = all_documents_in_group(oldGroup)
-            i = 2
-            for document in relatedDocuments:
-                document.group = doc1.group
-                newOrder = nb_of_documents(doc1.group) + i
-                update_document(document, doc1.group, newOrder)
+            old_group = doc2.group
+            related_documents = all_documents_in_group(old_group)
+            i = 0
+            for db_document in related_documents:
+                db_document.group = new_group
+                new_order = new_group.nrPages + i
+                update_document(db_document, new_group, new_order)
                 i += 1
-                return doc1.group
-        # case 2: doc 1 already in group, doc 2 in no group -> add new doc to existing group
-        elif doc2.group is None:
-            newOrder = nb_of_documents(doc1.group) + 1
-            update_document(doc2, doc1.group, newOrder)
-            return doc1.group
-    # case 3: the documents are not in a group -> create new group and add docs to group
-    elif doc1.group is None:
-        if doc2.group is None:
-            group = Group(name=doc1.name)
-            group.save()
-
-            order = 0
-            update_document(doc1, group, order)
-            update_document(doc2, group, order + 1)
-            return doc1.group
-        # case 4: doc 2 in no group, doc 2 already in a group -> add new doc to existing group
-        elif doc2.group != -1:
-            newOrder = nb_of_documents(doc2.group) + 1
-            update_document(doc1, doc2.group, newOrder)
-            return doc1.group
+            old_group.delete()
+            new_group.nrPages += i
+            new_group.save()
+            return new_group
 
 
 @api_view(['GET'])
