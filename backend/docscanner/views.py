@@ -169,6 +169,40 @@ def rename_document(request):
         return HttpResponse(status=status.HTTP_200_OK)
 
 
+@api_view(['POST'])
+def ungroup(request):
+    if request.method == 'POST':
+        file_id = request.data['file_id']
+
+        db_document = Document.objects.get(id=file_id)
+        if db_document is None:
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+
+        old_group = db_document.group
+
+        if old_group.nrPages == 1:
+            return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        file_group = Group(name=db_document.name.replace('.jpg', ''))
+        file_group.save()
+
+        db_document.group = file_group
+        db_document.order = 0
+        db_document.save()
+
+        old_group.nrPages -= 1
+        old_group.save()
+
+        related_documents = all_documents_in_group(old_group)
+        i = 0
+        for doc in related_documents:
+            doc.order = i
+            doc.save()
+            i += 1
+
+        return HttpResponse(status=status.HTTP_200_OK)
+
+
 def gen():
     while True:
         frame = camera.get_cv_frame()

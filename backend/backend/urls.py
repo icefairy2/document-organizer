@@ -26,5 +26,6 @@ urlpatterns = [
     path('api/groups/', views.groups_list),
     path('api/group/', views.group),
     path('api/group/<int:group_id>/', views.group),
+    path('api/ungroup/', views.ungroup),
     path('camera_feed', views.camera_feed),
 ]

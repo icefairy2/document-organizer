@@ -75,6 +75,23 @@ function getGroupName(groupId, setGroupName) {
         });
 };
 
+function ungroup(fileId, handleRefresh) {
+    fetch('http://localhost:8000/api/ungroup/', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            'file_id': fileId
+        })
+    }).then(response => {
+        if (response.ok) {
+            handleRefresh();
+        }
+    })
+};
+
 export default function DocumentCard({ documents, id, name, nrPages, zIndexVar, setZIndexVar, positions, setDocumentsPositions, handleRefresh }) {
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
@@ -300,8 +317,8 @@ export default function DocumentCard({ documents, id, name, nrPages, zIndexVar, 
                         style={{ color: 'white', borderColor: "white", }}
                         variant="outlined"
                         size="large"
-                    // className={classes.button}
-                    // onClick={props.handleSave}
+                        disabled={documents.length === 1}
+                        onClick={() => ungroup(documents[imageIndex].id, handleRefresh)}
                     >
                         Remove from group
                     </Button>
