@@ -1,20 +1,17 @@
 import React from 'react';
 import './App.css';
-import Button from '@material-ui/core/Button';
-import SaveIcon from '@material-ui/icons/Save';
 import { makeStyles } from '@material-ui/core/styles';
 import SearchBar from "material-ui-search-bar";
+import { List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import DescriptionIcon from '@material-ui/icons/Description';
 
 const useStyles = makeStyles((theme) => ({
-    button: {
-        margin: theme.spacing(1),
-    },
-    media: {
-        // height: '100%',
-        // width: '100%',
-    },
     root: {
-        display: 'flex',
+        overflow: 'auto',
+        position: 'relative',
+        maxHeight: '80%',
+        height: '80%',
+        marginTop: theme.spacing(2),
     },
 }));
 
@@ -24,10 +21,22 @@ function Search(props) {
     return (
         <React.Fragment>
             <SearchBar
-                value={'yes'}
-            // onChange={(newValue) => this.setState({ value: newValue })}
-            // onRequestSearch={() => doSomethingWith(this.state.value)}
+                style={{ height: '10%' }}
+                onChange={(newValue) => props.setFilterTerm(newValue)}
+                onCancelSearch={() => props.setFilterTerm('')}
             />
+            <List dense={true} className={classes.root}>
+                {props.documents.map(document => (
+                    <ListItem button>
+                        <ListItemIcon>
+                            <DescriptionIcon />
+                        </ListItemIcon>
+                        <ListItemText
+                            primary={document.name}
+                        />
+                    </ListItem>
+                ))}
+            </List>
         </React.Fragment>
     );
 }

@@ -32,7 +32,8 @@ const useStyles = makeStyles((theme) => ({
     searchSection: {
         paddingTop: theme.spacing(2),
         alignItems: "stretch",
-        flexGrow: 1,
+        maxHeight: '50vh',
+        height: '50vh'
     }
 }));
 
@@ -66,6 +67,16 @@ export default function App() {
     const classes = useStyles();
     const [refresh, doRefresh] = useState(0);
     const [documents, setDocuments] = useState([]);
+    const [filterTerm, setFilterTerm] = useState('');
+    const [filteredDocs, setfilteredDocs] = useState([]);
+
+    useEffect(() => {
+        var filtered = documents.filter((document) => {
+            const searchVal = document.name.toLowerCase();
+            return searchVal.indexOf(filterTerm) !== -1;
+        });
+        setfilteredDocs(filtered);
+    }, [filterTerm, documents]);
 
     const handleRefresh = () => {
         getDocuments(setDocuments);
@@ -93,13 +104,13 @@ export default function App() {
                         </Paper>
                     </Grid>
                     <Grid item className={classes.searchSection}>
-                        <Paper className={classes.paper} style={{ height: 'calc(100% - 16px)', overflow: 'auto' }}>
-                            <Search documents={documents} />
+                        <Paper className={classes.paper} style={{ height: 'calc(100% - 16px)' }}>
+                            <Search documents={filteredDocs} setFilterTerm={setFilterTerm} />
                         </Paper>
                     </Grid>
                 </Grid>
                 <Grid item xs={9} className={classes.desktop} overflow="visible">
-                    <Desktop documents={documents} />
+                    <Desktop documents={filteredDocs} />
                 </Grid>
             </Grid>
         </Container>
