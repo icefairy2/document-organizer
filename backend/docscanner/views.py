@@ -46,7 +46,6 @@ def merge_docs(doc1, doc2):
                 new_order = new_group.nrPages + i
                 update_document(db_document, new_group, new_order)
                 i += 1
-            old_group.delete()
             new_group.nrPages += i
             new_group.save()
             return new_group
@@ -80,11 +79,11 @@ def document(request, file_id=''):
         frame = camera.get_cv_frame()
 
         dt_string = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_name = 'doc_' + dt_string + '.jpg'
-        file_path = os.path.join(settings.MEDIA_ROOT, file_name)
-        file_group = Group(name=file_name)
-        file_group.save()
         file_order = 0
+        file_name = 'doc_' + str(file_order) + '_' + dt_string + '.jpg'
+        file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+        file_group = Group(name=file_name.replace('.jpg', ''))
+        file_group.save()
 
         cv2.imwrite(file_path, frame)
 
@@ -97,7 +96,7 @@ def document(request, file_id=''):
 
     elif request.method == 'DELETE':
         # TODO
-        Document.objects.get(name=file).delete()
+        Document.objects.get(name=file_id).delete()
         return Response(status=status.HTTP_200_OK)
 
 
@@ -129,29 +128,33 @@ def group(request, group_id=''):
 
     elif request.method == 'DELETE':
         # TODO
-        Group.objects.get(name=name).delete()
+        Group.objects.get(id=group_id).delete()
         return Response(status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 def rename_document(request):
     if request.method == 'POST':
-        doc_id = request.data['id']
+        group_id = request.data['id']
         file_name = request.data['new_name']
 
-        db_document = Document.objects.get(id=doc_id)
+        db_group = Group.objects.get(id=group_id)
 
-        if db_document is None:
+        if db_group is None:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
 
-        old_file_path = db_document.filePath
-        file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+        db_group.name = file_name.replace('.jpg', '')
+        db_group.save()
 
-        os.rename(old_file_path, file_path)
-
-        db_document.name = file_name
-        db_document.filePath = file_path
-        db_document.save()
+        related_documents = all_documents_in_group(db_group)
+        for doc in related_documents:
+            new_file_name = file_name.replace('.jpg', '') + str(doc.order) + '.jpg'
+            doc.name = new_file_name
+            old_file_path = doc.filePath
+            file_path = os.path.join(settings.MEDIA_ROOT, new_file_name)
+            os.rename(old_file_path, file_path)
+            doc.filePath = file_path
+            doc.save()
 
         return HttpResponse(status=status.HTTP_200_OK)
 
