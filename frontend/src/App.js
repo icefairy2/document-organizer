@@ -50,8 +50,8 @@ function handleSave(callback) {
     });
 };
 
-function getDocuments(setDocuments) {
-    fetch('http://localhost:8000/api/documents/', {
+function getGroups(setGroups) {
+    fetch('http://localhost:8000/api/groups/', {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -59,27 +59,32 @@ function getDocuments(setDocuments) {
         }
     }).then(response => response.json())
         .then(data => {
-            setDocuments(data);
+            var groups = [];
+            data.forEach((group) => groups[group.id] = group);
+            setGroups(groups);
         });
 };
 
 export default function App() {
     const classes = useStyles();
     const [refresh, doRefresh] = useState(0);
-    const [documents, setDocuments] = useState([]);
     const [filterTerm, setFilterTerm] = useState('');
-    const [filteredDocs, setfilteredDocs] = useState([]);
+    const [filteredGroups, setfilteredGroups] = useState([]);
+    const [groups, setGroups] = useState([]);
+
+    const [documentsPositions, setDocumentsPositions] = useState({});
+    const [zIndexVar, setZIndexVar] = useState(1);
 
     useEffect(() => {
-        var filtered = documents.filter((document) => {
-            const searchVal = document.name.toLowerCase();
+        var filtered = groups.filter((group) => {
+            const searchVal = group.name.toLowerCase();
             return searchVal.indexOf(filterTerm) !== -1;
         });
-        setfilteredDocs(filtered);
-    }, [filterTerm, documents]);
+        setfilteredGroups(filtered);
+    }, [filterTerm, groups]);
 
     const handleRefresh = () => {
-        getDocuments(setDocuments);
+        getGroups(setGroups);
     }
 
     useEffect(() => {
@@ -89,6 +94,16 @@ export default function App() {
     useEffect(() => {
         handleRefresh();
     }, [refresh]);
+
+    useEffect(() => {
+        var positions = {};
+        var i = 0;
+        groups.forEach((document) => {
+            positions[document.id] = [(i % 4) * 250, Math.floor(i / 4) * 210];
+            i++;
+        });
+        setDocumentsPositions(positions);
+    }, [groups]);
 
     const handleSaveAndRefresh = () => {
         handleSave(() => doRefresh(prev => prev + 1));
@@ -105,12 +120,19 @@ export default function App() {
                     </Grid>
                     <Grid item className={classes.searchSection}>
                         <Paper className={classes.paper} style={{ height: 'calc(100% - 16px)' }}>
-                            <Search documents={filteredDocs} setFilterTerm={setFilterTerm} />
+                            <Search groups={filteredGroups} setFilterTerm={setFilterTerm} />
                         </Paper>
                     </Grid>
                 </Grid>
                 <Grid item xs={9} className={classes.desktop} overflow="visible">
-                    <Desktop documents={filteredDocs} />
+                    <Desktop
+                        groups={filteredGroups}
+                        zIndexVar={zIndexVar}
+                        setZIndexVar={setZIndexVar}
+                        documentsPositions={documentsPositions}
+                        setDocumentsPositions={setDocumentsPositions}
+                        handleRefresh={() => doRefresh(prev => prev + 1)}
+                    />
                 </Grid>
             </Grid>
         </Container>

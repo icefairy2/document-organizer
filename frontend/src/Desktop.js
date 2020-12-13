@@ -1,30 +1,25 @@
 import React from "react";
-import { Grid, Container } from "@material-ui/core";
+import { Container } from "@material-ui/core";
 import "./Resizable.css";
 import DocumentCard from "./DocumentCard";
 
 export default function Desktop(props) {
     return (
         <Container maxWidth={false} style={{ height: '100%', overflow: 'auto' }}>
-            <Grid
-                height="100%"
-                container
-                spacing={1}
-            >
-                {props.documents.map(document => (
-                    <Grid
-                        item
-                        md={3}
-                    >
-                        <DocumentCard
-                            image={'http://localhost:8000/api/document/' + encodeURI(document.filePath)}
-                            name={document.name}
-                            id={document.id}
-                        />
-                    </Grid>
+            {props.groups.length > 0 &&
+                props.groups.map(group => (
+                    <DocumentCard
+                        documents={group.documents}
+                        id={group.id}
+                        name={group.name}
+                        nrPages={group.nrPages}
+                        zIndexVar={props.zIndexVar}
+                        setZIndexVar={props.setZIndexVar}
+                        positions={props.documentsPositions}
+                        setDocumentsPositions={props.setDocumentsPositions}
+                        handleRefresh={props.handleRefresh}
+                    />
                 ))}
-            </Grid>
         </Container>
-
     );
 }
