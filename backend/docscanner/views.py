@@ -107,13 +107,13 @@ def document(request, file=''):
         dt_string = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         file_name = 'doc_' + dt_string + '.jpg'
         file_path = os.path.join(settings.MEDIA_ROOT, file_name)
-        file_date = dt_string
-        file_group = -1
-        file_order = -1
+        file_group = Group(name=file_name)
+        file_group.save()
+        file_order = 0
 
         cv2.imwrite(file_path, frame)
 
-        db_document = Document(name=file_name, filePath=file_path, scanningDate=file_date, group=file_group,
+        db_document = Document(name=file_name, filePath=file_path, scanningDate=datetime.now(), group=file_group,
                                order=file_order)
         db_document.save()
 

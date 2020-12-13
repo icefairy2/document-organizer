@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
-  }
+}
 
 function mergeDocs(id1, id2) {
     fetch('http://localhost:8000/api/group/', {
@@ -71,7 +71,7 @@ export default function DocumentCard({ image, name, id, zIndexVar, setZIndexVar,
     const [isEditingName, setIsEditingName] = React.useState(false);
     const [modifiedName, setModifiedName] = React.useState(name);
     const [zIndexLocal, setZIndexLocal] = React.useState(1);
-    
+
     const [openBar, setOpenBar] = React.useState(false);
 
     const handleClickBar = () => {
@@ -105,30 +105,31 @@ export default function DocumentCard({ image, name, id, zIndexVar, setZIndexVar,
     const handleDragStart = (e, data) => {
         setZIndexLocal(zIndexVar);
         setZIndexVar(zIndexVar + 1);
+    };
+
+    const handleDrag = (e, data) => {
         setIsDragging(true);
     };
 
     const handleDragStop = (e, data) => {
         setTimeout(() => setIsDragging(false), 50);
-        
+
         // Update the current card (document) position in the global var
-        positions[id] = [e.x, e.y];
+        positions[id] = [data.x, data.y];
         setDocumentsPositions(positions);
 
         // Iterate over (doc id - coords collection) key value pairs
-        for (const [currentDocId, coords] of Object.entries(positions))
-        {
-            if(currentDocId != id)
-            {   
+        for (const [currentDocId, coords] of Object.entries(positions)) {
+            //console.log("id:" + id + "  coord: "+coords[0] + " - " + coords[1]);
+            if (currentDocId !== id.toString()) {
                 // TODO: The position is a bit off for some cards, investigate why later
-                let xdif = Math.abs(e.x - coords[0]);
-                let ydif = Math.abs(e.y - coords[1]);
-                if( xdif < 70 && ydif < 70)
-                {
+                let xdif = Math.abs(data.x - coords[0]);
+                let ydif = Math.abs(data.y - coords[1]);
+                if (xdif < 70 && ydif < 70) {
                     mergeDocs(currentDocId, id);
                     handleClickBar();
                 }
-         
+
             }
         }
     };
@@ -184,7 +185,7 @@ export default function DocumentCard({ image, name, id, zIndexVar, setZIndexVar,
                     width: 240,
                     height: 200,
                 }}
-                onDrag={handleDragStart} onDragStop={handleDragStop}
+                onDragStart={handleDragStart} onDrag={handleDrag} onDragStop={handleDragStop}
                 style={{ zIndex: zIndexLocal }}
                 bounds={'parent'}
             >
@@ -277,10 +278,10 @@ export default function DocumentCard({ image, name, id, zIndexVar, setZIndexVar,
             </Dialog>
             <Snackbar open={openBar} autoHideDuration={2000} onClose={handleCloseBar}>
                 <Alert onClose={handleCloseBar} severity="success">
-                 Documents succesfully merged!
+                    Documents succesfully merged!
                 </Alert>
             </Snackbar>
         </React.Fragment>
-        
+
     );
 };

@@ -70,6 +70,9 @@ export default function App() {
     const [filterTerm, setFilterTerm] = useState('');
     const [filteredDocs, setfilteredDocs] = useState([]);
 
+    const [documentsPositions, setDocumentsPositions] = useState({});
+    const [zIndexVar, setZIndexVar] = useState(1);
+
     useEffect(() => {
         var filtered = documents.filter((document) => {
             const searchVal = document.name.toLowerCase();
@@ -89,6 +92,16 @@ export default function App() {
     useEffect(() => {
         handleRefresh();
     }, [refresh]);
+
+    useEffect(() => {
+        var positions = {};
+        var i = 0;
+        documents.forEach((document) => {
+            positions[document.id] = [(i % 4) * 250, Math.floor(i / 4) * 210];
+            i++;
+        });
+        setDocumentsPositions(positions);
+    }, [documents]);
 
     const handleSaveAndRefresh = () => {
         handleSave(() => doRefresh(prev => prev + 1));
@@ -110,7 +123,13 @@ export default function App() {
                     </Grid>
                 </Grid>
                 <Grid item xs={9} className={classes.desktop} overflow="visible">
-                    <Desktop documents={filteredDocs} />
+                    <Desktop
+                        documents={filteredDocs}
+                        zIndexVar={zIndexVar}
+                        setZIndexVar={setZIndexVar}
+                        documentsPositions={documentsPositions}
+                        setDocumentsPositions={setDocumentsPositions}
+                    />
                 </Grid>
             </Grid>
         </Container>
