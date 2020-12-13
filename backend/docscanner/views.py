@@ -12,12 +12,13 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from .camera import VideoCamera
 from datetime import datetime
+import time
 from rest_framework.response import Response
 
 from backend import settings
 
 camera = VideoCamera()
-
+inVideoMode = 1
 
 # method to get the number of documents in a group
 def nb_of_documents(group_id):
@@ -97,6 +98,7 @@ def groups_list(request):
 
 @api_view(['GET', 'POST'])
 def document(request, file=''):
+    global inVideoMode
     if request.method == 'GET':
         image_data = open(file, "rb").read()
         return HttpResponse(image_data, content_type="image/jpg")
@@ -104,21 +106,19 @@ def document(request, file=''):
     elif request.method == 'POST':
 
         frame = camera.get_cv_frame()
-
+        inVideoMode = 1
         #directory = r'C:\Users\Alexandra Dobre\Documents\Master\An II\NGUI\document-organizer\backend\scanned-documents'
 
         dt_string = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
         file_name = 'doc_' + dt_string + '.jpg'
-        file_path = os.path.join(os.getcwd(), file_name)
+        directory = os.path.join(os.getcwd(), settings.MEDIA_ROOT)
+        print(directory)
+        file_path = os.path.join(directory, file_name)
 
         #file_path = os.path.join(settings.MEDIA_ROOT, file_name)
         file_date = datetime.now()
         file_group = None
         file_order = 0
-        print(os.getcwd())
-
-        cv2.imshow("frame", frame)
-        cv2.waitKey(0)
 
         if not cv2.imwrite(file_path, frame):
             raise Exception("could not write image")
@@ -197,15 +197,18 @@ def rename_document(request):
 
 
 def gen():
+    global inVideoMode
     while True:
-        frame = camera.get_cv_frame()
+        if inVideoMode == 1:
+            frame = camera.get_cv_frame()
+            inVideoMode = 0
         if frame is None:
             continue
 
         ret, jpeg = cv2.imencode('.jpg', frame)
         if not ret:
             continue
-
+        time.sleep(0.1)
         #encoded_frame = jpeg.tobytes()
 
         yield (b'--frame\r\n'
