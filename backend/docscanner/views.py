@@ -96,9 +96,10 @@ def groups_list(request):
 
 
 @api_view(['GET', 'POST'])
-def document(request, file=''):
+def document(request, file_id=''):
     if request.method == 'GET':
-        image_data = open(file, "rb").read()
+        db_document = Document.objects.get(id=file_id)
+        image_data = open(db_document.filePath, "rb").read()
         return HttpResponse(image_data, content_type="image/jpg")
 
     elif request.method == 'POST':

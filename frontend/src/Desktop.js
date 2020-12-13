@@ -8,9 +8,8 @@ export default function Desktop(props) {
         <Container maxWidth={false} style={{ height: '100%', overflow: 'auto' }}>
             {props.documents.map(document => (
                 <DocumentCard
-                    image={'http://localhost:8000/api/document/' + encodeURI(document.filePath)}
-                    name={document.name}
-                    id={document.id}
+                    image={'http://localhost:8000/api/document/' + document.id}
+                    document={document}
                     zIndexVar={props.zIndexVar}
                     setZIndexVar={props.setZIndexVar}
                     positions={props.documentsPositions}

@@ -63,13 +63,13 @@ function mergeDocs(id1, id2) {
     })
 }
 
-export default function DocumentCard({ image, name, id, zIndexVar, setZIndexVar, positions, setDocumentsPositions }) {
+export default function DocumentCard({ image, document, zIndexVar, setZIndexVar, positions, setDocumentsPositions }) {
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
     const [alertOpen, setAlertOpen] = React.useState(false);
     const [isDragging, setIsDragging] = React.useState(false);
     const [isEditingName, setIsEditingName] = React.useState(false);
-    const [modifiedName, setModifiedName] = React.useState(name);
+    const [modifiedName, setModifiedName] = React.useState(document.name);
     const [zIndexLocal, setZIndexLocal] = React.useState(1);
 
     const [openBar, setOpenBar] = React.useState(false);
@@ -115,18 +115,18 @@ export default function DocumentCard({ image, name, id, zIndexVar, setZIndexVar,
         setTimeout(() => setIsDragging(false), 50);
 
         // Update the current card (document) position in the global var
-        positions[id] = [data.x, data.y];
+        positions[document.id] = [data.x, data.y];
         setDocumentsPositions(positions);
 
         // Iterate over (doc id - coords collection) key value pairs
         for (const [currentDocId, coords] of Object.entries(positions)) {
             //console.log("id:" + id + "  coord: "+coords[0] + " - " + coords[1]);
-            if (currentDocId !== id.toString()) {
+            if (currentDocId !== document.id.toString()) {
                 // TODO: The position is a bit off for some cards, investigate why later
                 let xdif = Math.abs(data.x - coords[0]);
                 let ydif = Math.abs(data.y - coords[1]);
                 if (xdif < 70 && ydif < 70) {
-                    mergeDocs(currentDocId, id);
+                    mergeDocs(currentDocId, document.id);
                     handleClickBar();
                 }
 
@@ -135,7 +135,7 @@ export default function DocumentCard({ image, name, id, zIndexVar, setZIndexVar,
     };
 
     const onChange = (event) => {
-        if (name !== event.target.value) {
+        if (document.name !== event.target.value) {
             setIsEditingName(true);
             setModifiedName(event.target.value)
         } else {
@@ -153,7 +153,7 @@ export default function DocumentCard({ image, name, id, zIndexVar, setZIndexVar,
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                'id': id,
+                'id': document.id,
                 'new_name': modifiedName
             })
         }).then(response => {
@@ -170,7 +170,7 @@ export default function DocumentCard({ image, name, id, zIndexVar, setZIndexVar,
     }
 
     const handleDiscard = () => {
-        setModifiedName(name);
+        setModifiedName(document.name);
         setIsEditingName(false);
         setAlertOpen(false);
         setOpen(false);
@@ -180,8 +180,8 @@ export default function DocumentCard({ image, name, id, zIndexVar, setZIndexVar,
         <React.Fragment>
             <Rnd
                 default={{
-                    x: positions[id][0],
-                    y: positions[id][1],
+                    x: positions[document.id][0],
+                    y: positions[document.id][1],
                     width: 240,
                     height: 200,
                 }}
@@ -223,7 +223,7 @@ export default function DocumentCard({ image, name, id, zIndexVar, setZIndexVar,
                         <InputBase
                             style={{ color: 'white', fontSize: 30, width: '400' }}
                             size="large"
-                            defaultValue={name}
+                            defaultValue={document.name}
                             value={modifiedName}
                             fullWidth
                             multiline
@@ -240,7 +240,7 @@ export default function DocumentCard({ image, name, id, zIndexVar, setZIndexVar,
                             </IconButton>
                         }
                     </div>
-                    <img src={image} alt={name} />
+                    <img src={image} alt={document.name} />
                 </div>
                 <IconButton
                     style={{
@@ -264,7 +264,7 @@ export default function DocumentCard({ image, name, id, zIndexVar, setZIndexVar,
                 <DialogTitle id="alert-dialog-title">{"You have unsaved naming changes"}</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Do you want to rename document "{name}" to "{modifiedName}"?
+                        Do you want to rename document "{document.name}" to "{modifiedName}"?
                 </DialogContentText>
                 </DialogContent>
                 <DialogActions>
