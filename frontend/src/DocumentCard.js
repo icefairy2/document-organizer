@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, CardActionArea, CardMedia, makeStyles, Typography, Backdrop, InputBase, IconButton, Dialog, DialogContentText } from "@material-ui/core";
-import Draggable from "react-draggable";
+//import Draggable from "react-draggable";
+import { Rnd } from "react-rnd";
 import { ResizableBox } from "react-resizable";
 import "./Resizable.css";
 import CancelIcon from '@material-ui/icons/Cancel';
@@ -9,6 +10,8 @@ import Button from '@material-ui/core/Button';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -31,16 +34,57 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         flexWrap: 'wrap',
         margin: theme.spacing(1)
+    },
+    style: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: 'solid 1px #ddd',
+        background: '#f0f0f0'
     }
+
 }));
 
-export default function DocumentCard({ image, name, id }) {
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+  }
+
+function mergeDocs(id1, id2) {
+    fetch('http://localhost:8000/api/group/', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            'doc1_id': id1,
+            'doc2_id': id2
+        })
+    })
+}
+
+export default function DocumentCard({ image, name, id, zIndexVar, setZIndexVar, positions, setDocumentsPositions }) {
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
     const [alertOpen, setAlertOpen] = React.useState(false);
     const [isDragging, setIsDragging] = React.useState(false);
     const [isEditingName, setIsEditingName] = React.useState(false);
     const [modifiedName, setModifiedName] = React.useState(name);
+    const [zIndexLocal, setZIndexLocal] = React.useState(1);
+    
+    const [openBar, setOpenBar] = React.useState(false);
+
+    const handleClickBar = () => {
+        setOpenBar(true);
+    };
+
+    const handleCloseBar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpenBar(false);
+    };
 
     const handleResizeStart = (e, { size }) => {
         e.stopPropagation();
@@ -59,11 +103,34 @@ export default function DocumentCard({ image, name, id }) {
     };
 
     const handleDragStart = (e, data) => {
+        setZIndexLocal(zIndexVar);
+        setZIndexVar(zIndexVar + 1);
         setIsDragging(true);
     };
 
     const handleDragStop = (e, data) => {
         setTimeout(() => setIsDragging(false), 50);
+        
+        // Update the current card (document) position in the global var
+        positions[id] = [e.x, e.y];
+        setDocumentsPositions(positions);
+
+        // Iterate over (doc id - coords collection) key value pairs
+        for (const [currentDocId, coords] of Object.entries(positions))
+        {
+            if(currentDocId != id)
+            {   
+                // TODO: The position is a bit off for some cards, investigate why later
+                let xdif = Math.abs(e.x - coords[0]);
+                let ydif = Math.abs(e.y - coords[1]);
+                if( xdif < 70 && ydif < 70)
+                {
+                    mergeDocs(currentDocId, id);
+                    handleClickBar();
+                }
+         
+            }
+        }
     };
 
     const onChange = (event) => {
@@ -110,7 +177,17 @@ export default function DocumentCard({ image, name, id }) {
 
     return (
         <React.Fragment>
-            <Draggable onDrag={handleDragStart} onStop={handleDragStop}>
+            <Rnd
+                default={{
+                    x: positions[id][0],
+                    y: positions[id][1],
+                    width: 240,
+                    height: 200,
+                }}
+                onDrag={handleDragStart} onDragStop={handleDragStop}
+                style={{ zIndex: zIndexLocal }}
+                bounds={'parent'}
+            >
                 <div>
                     <ResizableBox
                         width={240}
@@ -138,7 +215,7 @@ export default function DocumentCard({ image, name, id }) {
                         </Card>
                     </ResizableBox>
                 </div>
-            </Draggable>
+            </Rnd>
             <Backdrop className={classes.backdrop} open={open}>
                 <div className={classes.fullImage}>
                     <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
@@ -198,6 +275,12 @@ export default function DocumentCard({ image, name, id }) {
                     </Button>
                 </DialogActions>
             </Dialog>
+            <Snackbar open={openBar} autoHideDuration={2000} onClose={handleCloseBar}>
+                <Alert onClose={handleCloseBar} severity="success">
+                 Documents succesfully merged!
+                </Alert>
+            </Snackbar>
         </React.Fragment>
+        
     );
 };

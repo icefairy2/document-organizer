@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function getDocuments(setDocuments) {
+function getDocuments(setDocuments, setDocumentsPositions, documentCount, setDocumentCount, setIsLoading) {
     fetch('http://localhost:8000/api/documents/', {
         method: 'GET',
         headers: {
@@ -29,6 +29,17 @@ function getDocuments(setDocuments) {
     }).then(response => response.json())
         .then(data => {
             setDocuments(data);
+
+            //let positions = [[100,100], [20, 20], [30, 30]];
+            var positions = {};
+            var i = documentCount;
+            for (const doc of data) {
+                positions[doc.id] = [i * 150, i * 80];
+                i++;
+            }
+            setDocumentCount(i);
+            setDocumentsPositions(positions);       
+            setIsLoading(false); 
         });
 };
 
@@ -36,9 +47,13 @@ function getDocuments(setDocuments) {
 
 export default function Desktop(props) {
     const [documents, setDocuments] = useState([]);
+    const [documentCount, setDocumentCount] = useState(0);
+    const [documentsPositions, setDocumentsPositions] = useState({});
+    const [zIndexVar, setZIndexVar] = useState(1);
+    const [isLoading, setIsLoading] = useState(true);
 
     const handleRefresh = () => {
-        getDocuments(setDocuments);
+        getDocuments(setDocuments, setDocumentsPositions, documentCount, setDocumentCount, setIsLoading);
     }
 
     useEffect(() => {
@@ -49,28 +64,30 @@ export default function Desktop(props) {
         handleRefresh();
     }, [props.refresh]);
 
+    if(!isLoading)
+    {
+        return (
+            <Container maxWidth={false} style={{ height: '100%', overflow: 'auto' }}>
+         
+                    {documents.map(document => (
+                    
+                            <DocumentCard
+                                image={'http://localhost:8000/api/document/' + encodeURI(document.filePath)}
+                                name={document.name}
+                                id={document.id}
+                                zIndexVar={zIndexVar}
+                                setZIndexVar={setZIndexVar}
+                                positions={documentsPositions}
+                                setDocumentsPositions={setDocumentsPositions}
+                            />
+                    
+                    ))}
 
-    return (
-        <Container maxWidth={false} style={{ height: '100%', overflow: 'auto' }}>
-            <Grid
-                height="100%"
-                container
-                spacing={1}
-            >
-                {documents.map(document => (
-                    <Grid
-                        item
-                        md={3}
-                    >
-                        <DocumentCard
-                            image={'http://localhost:8000/api/document/' + encodeURI(document.filePath)}
-                            name={document.name}
-                            id={document.id}
-                        />
-                    </Grid>
-                ))}
-            </Grid>
+          
         </Container>
-
-    );
+        );
+    }
+    {
+        return (<div></div>);
+    }
 }
