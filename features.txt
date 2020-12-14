@@ -42,3 +42,4 @@
 - change video streaming to websocket connection
 - add authentication to application and to all endpoints
 - add support to rotate documents/ camera feed
+- delete document

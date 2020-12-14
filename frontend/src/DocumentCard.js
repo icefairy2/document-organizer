@@ -318,7 +318,10 @@ export default function DocumentCard({ documents, id, name, nrPages, zIndexVar, 
                         variant="outlined"
                         size="large"
                         disabled={documents.length === 1}
-                        onClick={() => ungroup(documents[imageIndex].id, handleRefresh)}
+                        onClick={() => {
+                            ungroup(documents[imageIndex].id, handleRefresh);
+                            setImageIndex(0);
+                        }}
                     >
                         Remove from group
                     </Button>

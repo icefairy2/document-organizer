@@ -113,12 +113,12 @@ export default function App() {
         <Container maxWidth={false} className={classes.root}>
             <Grid container spacing={2} style={{ height: '100%' }}>
                 <Grid container spacing={2} direction="column" xs={3} style={{ paddingRight: 16 }}>
-                    <Grid item>
+                    <Grid item style={{ maxWidth: '100%' }}>
                         <Paper className={classes.paper} >
                             <Scanner handleSave={handleSaveAndRefresh} />
                         </Paper>
                     </Grid>
-                    <Grid item className={classes.searchSection}>
+                    <Grid item className={classes.searchSection} style={{ maxWidth: '100%' }}>
                         <Paper className={classes.paper} style={{ height: 'calc(100% - 16px)' }}>
                             <Search groups={filteredGroups} setFilterTerm={setFilterTerm} />
                         </Paper>

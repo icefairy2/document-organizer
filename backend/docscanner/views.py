@@ -90,13 +90,14 @@ def document(request, file_id=''):
 
         if new_name != '':
             x = new_name.splitlines()
-            file_name = x[0] + '.jpg'
+            file_name = x[0]
             if x[0] == '' or x[0].startswith(" "):
-                file_name = 'doc_' + dt_string + '.jpg'
+                file_name = 'doc_'
         else:
-            file_name = 'doc_' + dt_string + '.jpg'
+            file_name = 'doc_'
 
         file_name = file_name.replace(' ', '_')
+        file_name = file_name + '_' + dt_string + '.jpg'
         file_path = os.path.join(settings.MEDIA_ROOT, file_name)
         file_group = Group(name=file_name.replace('.jpg', ''))
         file_group.save()
