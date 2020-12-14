@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Card, CardActionArea, CardMedia, makeStyles, Typography, Backdrop, InputBase, IconButton, Dialog, DialogContentText } from "@material-ui/core";
-import Draggable from "react-draggable";
+import { Rnd } from "react-rnd";
 import { ResizableBox } from "react-resizable";
 import "./Resizable.css";
 import CancelIcon from '@material-ui/icons/Cancel';
@@ -9,6 +9,8 @@ import Button from '@material-ui/core/Button';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -31,16 +33,105 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         flexWrap: 'wrap',
         margin: theme.spacing(1)
+    },
+    style: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: 'solid 1px #ddd',
+        background: '#f0f0f0'
     }
+
 }));
 
-export default function DocumentCard({ image, name, id }) {
+function mergeDocs(id1, id2, handleRefresh) {
+    fetch('http://localhost:8000/api/group/', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            'doc1_id': id1,
+            'doc2_id': id2
+        })
+    }).then(response => {
+        if (response.ok) {
+            handleRefresh();
+        }
+    })
+}
+
+function getGroupName(groupId, setGroupName) {
+    fetch('http://localhost:8000/api/group/' + groupId.toString(), {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+    }).then(response => response.json())
+        .then(data => {
+            setGroupName(data.name);
+        });
+};
+
+function ungroup(fileId, handleRefresh) {
+    fetch('http://localhost:8000/api/ungroup/', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            'file_id': fileId
+        })
+    }).then(response => {
+        if (response.ok) {
+            handleRefresh();
+        }
+    })
+};
+
+export default function DocumentCard({ documents, id, name, nrPages, zIndexVar, setZIndexVar, positions, setDocumentsPositions, handleRefresh }) {
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
     const [alertOpen, setAlertOpen] = React.useState(false);
     const [isDragging, setIsDragging] = React.useState(false);
     const [isEditingName, setIsEditingName] = React.useState(false);
     const [modifiedName, setModifiedName] = React.useState(name);
+    const [zIndexLocal, setZIndexLocal] = React.useState(1);
+
+    const [image, setImage] = React.useState('http://localhost:8000/api/document/' + documents[0].id.toString());
+    const [imageIndex, setImageIndex] = React.useState(0);
+
+    const [gr1Name, setGr1Name] = React.useState('');
+    const [gr2Name, setGr2Name] = React.useState('');
+
+    const [gr1Id, setGr1Id] = React.useState(-1);
+    const [gr2Id, setGr2Id] = React.useState(-1);
+
+    const [openBar, setOpenBar] = React.useState(false);
+
+    useEffect(() => {
+        setImage('http://localhost:8000/api/document/' + documents[imageIndex].id.toString())
+    }, [imageIndex, documents]);
+
+    const handleClickBar = (gr1_id, gr2_id) => {
+        setGr1Id(gr1_id);
+        setGr2Id(gr2_id);
+        getGroupName(gr1_id, setGr1Name);
+        getGroupName(gr2_id, setGr2Name);
+        setOpenBar(true);
+    };
+
+    const handleMergeGroups = () => {
+        mergeDocs(gr1Id, gr2Id, handleRefresh);
+        setOpenBar(false);
+    };
+
+    const handleCloseBar = (event, reason) => {
+        setOpenBar(false);
+    };
 
     const handleResizeStart = (e, { size }) => {
         e.stopPropagation();
@@ -59,11 +150,35 @@ export default function DocumentCard({ image, name, id }) {
     };
 
     const handleDragStart = (e, data) => {
+        setZIndexLocal(zIndexVar);
+        setZIndexVar(zIndexVar + 20);
+    };
+
+    const handleDrag = (e, data) => {
         setIsDragging(true);
     };
 
     const handleDragStop = (e, data) => {
         setTimeout(() => setIsDragging(false), 50);
+
+        // Update the current card (document) position in the global var
+        positions[id] = [data.x, data.y];
+        setDocumentsPositions(positions);
+
+        // Iterate over (doc id - coords collection) key value pairs
+        for (const [currentDocId, coords] of Object.entries(positions)) {
+            //console.log("id:" + id + "  coord: "+coords[0] + " - " + coords[1]);
+            if (currentDocId !== id.toString()) {
+                // TODO: The position is a bit off for some cards, investigate why later
+                let xdif = Math.abs(data.x - coords[0]);
+                let ydif = Math.abs(data.y - coords[1]);
+                if (xdif < 70 && ydif < 70) {
+                    handleClickBar(currentDocId, id);
+                    return;
+                }
+
+            }
+        }
     };
 
     const onChange = (event) => {
@@ -90,13 +205,14 @@ export default function DocumentCard({ image, name, id }) {
             })
         }).then(response => {
             if (response.ok) {
+                handleRefresh();
                 setIsEditingName(false);
             }
         });
     }
 
     const handleDialogSave = () => {
-        handleSave();
+        handleSave(handleRefresh);
         setAlertOpen(false);
         setOpen(false);
     }
@@ -108,9 +224,27 @@ export default function DocumentCard({ image, name, id }) {
         setOpen(false);
     }
 
+    const handleNext = () => {
+        setImageIndex(imageIndex + 1);
+    }
+
+    const handlePrev = () => {
+        setImageIndex(imageIndex - 1);
+    }
+
     return (
         <React.Fragment>
-            <Draggable onDrag={handleDragStart} onStop={handleDragStop}>
+            <Rnd
+                default={{
+                    x: positions[id][0],
+                    y: positions[id][1],
+                    width: 240,
+                    height: 200,
+                }}
+                onDragStart={handleDragStart} onDrag={handleDrag} onDragStop={handleDragStop}
+                style={{ zIndex: zIndexLocal }}
+                bounds={'parent'}
+            >
                 <div>
                     <ResizableBox
                         width={240}
@@ -127,7 +261,7 @@ export default function DocumentCard({ image, name, id }) {
                                 }
                             }}>
                                 <Typography variant="overline">
-                                    {modifiedName}
+                                    {modifiedName + '(' + nrPages + ')'}
                                 </Typography>
 
                                 <CardMedia
@@ -138,7 +272,7 @@ export default function DocumentCard({ image, name, id }) {
                         </Card>
                     </ResizableBox>
                 </div>
-            </Draggable>
+            </Rnd>
             <Backdrop className={classes.backdrop} open={open}>
                 <div className={classes.fullImage}>
                     <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
@@ -163,6 +297,31 @@ export default function DocumentCard({ image, name, id }) {
                         }
                     </div>
                     <img src={image} alt={name} />
+                    <div style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                        <IconButton
+                            style={{ color: 'white' }}
+                            disabled={imageIndex === 0}
+                            onClick={handlePrev}
+                        >
+                            <ArrowBackIosIcon fontSize="large" />
+                        </IconButton>
+                        <IconButton
+                            style={{ color: 'white' }}
+                            disabled={imageIndex === documents.length - 1}
+                            onClick={handleNext}
+                        >
+                            <ArrowForwardIosIcon fontSize="large" />
+                        </IconButton>
+                    </div>
+                    <Button
+                        style={{ color: 'white', borderColor: "white", }}
+                        variant="outlined"
+                        size="large"
+                        disabled={documents.length === 1}
+                        onClick={() => ungroup(documents[imageIndex].id, handleRefresh)}
+                    >
+                        Remove from group
+                    </Button>
                 </div>
                 <IconButton
                     style={{
@@ -198,6 +357,28 @@ export default function DocumentCard({ image, name, id }) {
                     </Button>
                 </DialogActions>
             </Dialog>
+            <Dialog
+                open={openBar}
+                onClose={handleCloseBar}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"Merging documents"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Do you want to merge "{gr1Name}" with "{gr2Name}"?
+                </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleMergeGroups} color="primary">
+                        Save
+                    </Button>
+                    <Button onClick={handleCloseBar} color="primary" autoFocus>
+                        Discard
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </React.Fragment>
+
     );
 };

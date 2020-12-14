@@ -21,10 +21,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/documents/', views.document_list),
     path('api/document/', views.document),
-    path('api/document/<str:file>/', views.document),
+    path('api/document/<int:file_id>/', views.document),
     path('api/rename/', views.rename_document),
     path('api/groups/', views.groups_list),
     path('api/group/', views.group),
     path('api/group/<int:group_id>/', views.group),
+    path('api/ungroup/', views.ungroup),
     path('camera_feed', views.camera_feed),
 ]

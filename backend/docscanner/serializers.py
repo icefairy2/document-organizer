@@ -12,4 +12,4 @@ class DocumentSerializer(serializers.ModelSerializer):
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'nrPages')

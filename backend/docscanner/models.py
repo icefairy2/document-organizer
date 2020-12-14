@@ -9,6 +9,7 @@ from django.utils import timezone
 
 class Group(models.Model):
     name = models.CharField(max_length=120)
+    nrPages = models.PositiveIntegerField(default=1)
 
     def _str_(self):
         return self.name
