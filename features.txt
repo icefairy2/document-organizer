@@ -1,0 +1,43 @@
+**** EXISTS ****
+- save button: 
+    - save the current scanned camera frame
+    - display it as a card with (1) page
+    - display it in the list below search
+- drag:
+    - drag anywhere within the boundaries of 'desktop' space
+    - resize element from bottom right corner
+    - when dragged and released on another card, group dialog appears
+        - when 'save' is clicked cards are merged => 1 card instead of 2 and page nr updated
+        - 'discard' no changes should happen
+        - sometimes positioning issues
+- cards
+    - when clicked, large view displays
+    - in large view, only exit by clicking the X button on top right
+    - above page, the name is editable
+    - when name is edited, save button appears
+        - if save button is clicked, save name dialog appears
+            - 'save' clicked the document name updates everywhere on screen, save button disappears
+            - 'discard' no changes should happen
+    - display current page both large and on card in background
+    - below image < > navigation buttons
+    - < previous page if any in the group
+    - > next page if any in the group
+    - below navigation, 'REMOVE FROM GROUP' button
+        - when clicked, page should be removed from current group, page nr decreased and separate card created for removed page
+        - wasn't extensively tested, could lead to errors
+- search
+    - filters real-time both list below and cards on desktop
+    - causes a positioning bug sometimes on desktop
+- list bottom left corner
+    - elements are clickable but no real function yet
+    - could be used for folder structure or ordering
+    
+**** FURTHER ****
+- improve scanning procedure
+- option to turn of 'scanning'
+- solve ordering of pages within document
+- fix positioning bugs
+- bug at remove doc
+- change video streaming to websocket connection
+- add authentication to application and to all endpoints
+- add support to rotate documents/ camera feed

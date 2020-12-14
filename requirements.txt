@@ -3,3 +3,5 @@ djangorestframework~=3.12.2
 django-cors-headers
 opencv-python~=4.4.0.46
 numpy~=1.19.3
+scipy~=1.5.4
+pytesseract~=0.3.6

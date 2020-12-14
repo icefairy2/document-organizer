@@ -3,6 +3,8 @@ Raspberry Pi and multitouch table based document organizer for the project at Ne
 
 Demo: https://youtu.be/JoeU9du33CY
 
+A list of available features and further improvements is available in file _features.txt_.
+
 ## Table of contents
 + [Development setup](#development-setup)
   - [Prerequisites](#prerequisites)
