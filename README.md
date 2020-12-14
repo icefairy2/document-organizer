@@ -1,6 +1,8 @@
 # Document scanner and organizer
 Raspberry Pi and multitouch table based document organizer for the project at Next Generation User Interfaces lecture.
 
+Demo: https://youtu.be/JoeU9du33CY
+
 ## Table of contents
 + [Development setup](#development-setup)
   - [Prerequisites](#prerequisites)
