@@ -15,9 +15,10 @@
     - in large view, only exit by clicking the X button on top right
     - above page, the name is editable
     - when name is edited, save button appears
-        - if save button is clicked, save name dialog appears
-            - 'save' clicked the document name updates everywhere on screen, save button disappears
-            - 'discard' no changes should happen
+        - if save button is clicked, name is saved
+        - if 'close' button is pressed while unsaved name changes, 'unsaved changes' dialog appears
+            - 'save' clicked the document name updates everywhere on screen, preview closes
+            - 'discard' no naming changes should happen, preview closes
     - display current page both large and on card in background
     - below image < > navigation buttons
     - < previous page if any in the group
