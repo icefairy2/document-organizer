@@ -8,10 +8,6 @@ const useStyles = makeStyles((theme) => ({
   button: {
     margin: theme.spacing(1),
   },
-  media: {
-    // height: '100%',
-    // width: '100%',
-  },
   root: {
     display: 'flex',
   },
@@ -22,7 +18,7 @@ function Scanner(props) {
 
   return (
     <React.Fragment>
-      <img src="http://localhost:8000/camera_feed" width="100%" alt="camera_feed" style={{ paddingTop: 16 }} />
+      <img src="http://localhost:8000/camera_feed" height="300vh" width="300vh" alt="camera_feed" style={{ paddingTop: 16 }} />
       <Button
         variant="contained"
         color="primary"

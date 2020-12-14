@@ -13,7 +13,7 @@ from rest_framework.decorators import api_view
 from .camera import VideoCamera
 from datetime import datetime
 from rest_framework.response import Response
-
+import pytesseract as pytesseract
 from backend import settings
 
 camera = VideoCamera()
@@ -82,12 +82,25 @@ def document(request, file_id=''):
     elif request.method == 'POST':
         frame = camera.get_cv_frame()
 
+        img_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        pytesseract.pytesseract.tesseract_cmd = "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
+        new_name = pytesseract.image_to_string(img_rgb)
+
         dt_string = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_order = 0
-        file_name = 'doc_' + str(file_order) + '_' + dt_string + '.jpg'
+
+        if new_name != '':
+            x = new_name.splitlines()
+            file_name = x[0] + '.jpg'
+            if x[0] == '' or x[0].startswith(" "):
+                file_name = 'doc_' + dt_string + '.jpg'
+        else:
+            file_name = 'doc_' + dt_string + '.jpg'
+
+        file_name = file_name.replace(' ', '_')
         file_path = os.path.join(settings.MEDIA_ROOT, file_name)
         file_group = Group(name=file_name.replace('.jpg', ''))
         file_group.save()
+        file_order = 0
 
         cv2.imwrite(file_path, frame)
 
