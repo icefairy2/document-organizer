@@ -86,7 +86,7 @@ def document(request, file_id=''):
         pytesseract.pytesseract.tesseract_cmd = "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
         new_name = pytesseract.image_to_string(img_rgb)
 
-        dt_string = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        dt_string = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
         if new_name != '':
             x = new_name.splitlines()
@@ -95,6 +95,8 @@ def document(request, file_id=''):
                 file_name = 'doc_' + dt_string + '.jpg'
         else:
             file_name = 'doc_' + dt_string + '.jpg'
+
+        file_name = file_name.replace(' ', '_')
         file_path = os.path.join(settings.MEDIA_ROOT, file_name)
         file_group = Group(name=file_name.replace('.jpg', ''))
         file_group.save()

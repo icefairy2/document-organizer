@@ -9,6 +9,7 @@ from .pyimagesearch.transform import four_point_transform
 from skimage.filters import threshold_local
 import numpy as np
 
+
 class VideoCamera(object):
     def __init__(self):
         self.video = cv2.VideoCapture(0)
@@ -30,7 +31,7 @@ class VideoCamera(object):
         ratio = image.shape[0] / RESCALED_HEIGHT
         rescaled_image = utils.resize(image, height=int(RESCALED_HEIGHT))
 
-        #warped = transform.four_point_transform(orig, screenCnt * ratio)
+        # warped = transform.four_point_transform(orig, screenCnt * ratio)
 
         imgGray = cv2.cvtColor(rescaled_image, cv2.COLOR_BGR2GRAY)
 
@@ -54,7 +55,7 @@ class VideoCamera(object):
         imgContours = image.copy()  # COPY IMAGE FOR DISPLAY PURPOSES
         imgBigContour = image.copy()  # COPY IMAGE FOR DISPLAY PURPOSES
         contours, hierarchy = cv2.findContours(imgThreshold, cv2.RETR_EXTERNAL,
-                                             cv2.CHAIN_APPROX_SIMPLE)  # FIND ALL CONTOURS
+                                               cv2.CHAIN_APPROX_SIMPLE)  # FIND ALL CONTOURS
         # cv2.drawContours(imgContours, contours, -1, (0, 255, 0), 10)  # DRAW ALL DETECTED CONTOURS
 
         # find the contours in the edged image, keeping only the
@@ -100,7 +101,7 @@ class VideoCamera(object):
             self.get_text(final_img)
             return final_img
         else:
-            #FIND THE BIGGEST COUNTOUR
+            # FIND THE BIGGEST COUNTOUR
             biggest, maxArea = utils.biggestContour(contours)  # FIND THE BIGGEST CONTOUR
             if biggest.size != 0:
                 biggest = utils.reorder(biggest)
@@ -110,7 +111,8 @@ class VideoCamera(object):
                 cv2.waitKey(0)
 
                 pts1 = np.float32(biggest)  # PREPARE POINTS FOR WARP
-                pts2 = np.float32([[0, 0], [widthImg, 0], [0, heightImg], [widthImg, heightImg]])  # PREPARE POINTS FOR WARP
+                pts2 = np.float32(
+                    [[0, 0], [widthImg, 0], [0, heightImg], [widthImg, heightImg]])  # PREPARE POINTS FOR WARP
                 matrix = cv2.getPerspectiveTransform(pts1, pts2)
                 imgWarpColored = cv2.warpPerspective(image, matrix, (widthImg, heightImg))
 
@@ -126,7 +128,7 @@ class VideoCamera(object):
 
                 # Image Array for Display
                 imageArray = ([image, imgGray, imgThreshold, imgContours],
-                                [imgBigContour, imgWarpColored, imgWarpGray, imgAdaptiveThre])
+                              [imgBigContour, imgWarpColored, imgWarpGray, imgAdaptiveThre])
                 self.get_text(imgAdaptiveThre)
                 return imgAdaptiveThre
             else:
@@ -149,50 +151,48 @@ class VideoCamera(object):
         #     cv2.waitKey(300)
         #     count += 1
 
-
-
 # MORPH = 9
 #         # dilate helps to remove potential holes between edge segments
 #         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (MORPH, MORPH))
 #         imgDilated = cv2.dilate(imgBlur, kernel)
 #         #
 #         CANNY = 84
-        # find edges and mark them in the output map using the Canny algorithm
-        # edged = cv2.Canny(imgDilated, 0, CANNY)
-        #
-        # IM_HEIGHT, IM_WIDTH, _ = image.shape
-        # approx_contours = []
-        #
-        # (cnts, hierarchy) = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        # cnts = sorted(cnts, key=cv2.contourArea, reverse=True)[:5]
-        #
-        # # loop over the contours
-        # for c in cnts:
-        #     # approximate the contour
-        #     approx = cv2.approxPolyDP(c, 80, True)
-        #     if self.is_valid_contour(approx, IM_WIDTH, IM_HEIGHT):
-        #         approx_contours.append(approx)
-        #         break
-        #
-        # # If we did not find any valid contours, just use the whole image
-        # if not approx_contours:
-        #     TOP_RIGHT = (IM_WIDTH, 0)
-        #     BOTTOM_RIGHT = (IM_WIDTH, IM_HEIGHT)
-        #     BOTTOM_LEFT = (0, IM_HEIGHT)
-        #     TOP_LEFT = (0, 0)
-        #     screenCnt = np.array([[TOP_RIGHT], [BOTTOM_RIGHT], [BOTTOM_LEFT], [TOP_LEFT]])
-        # else:
-        #     screenCnt = max(approx_contours, key=cv2.contourArea)
-        #
-        # screenCnt = screenCnt.reshape(4, 2)
-        #
-        # # apply perspective transformation
-        # warped = transform.four_point_transform(orig, screenCnt * ratio)
-        # gray = cv2.cvtColor(warped, cv2.COLOR_BGR2GRAY)
-        #
-        # sharpen = cv2.GaussianBlur(gray, (0, 0), 3)
-        # sharpen = cv2.addWeighted(gray, 2.5, sharpen, -0.5, 0)
-        #
-        # thresh = cv2.adaptiveThreshold(sharpen, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 15)
+# find edges and mark them in the output map using the Canny algorithm
+# edged = cv2.Canny(imgDilated, 0, CANNY)
+#
+# IM_HEIGHT, IM_WIDTH, _ = image.shape
+# approx_contours = []
+#
+# (cnts, hierarchy) = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+# cnts = sorted(cnts, key=cv2.contourArea, reverse=True)[:5]
+#
+# # loop over the contours
+# for c in cnts:
+#     # approximate the contour
+#     approx = cv2.approxPolyDP(c, 80, True)
+#     if self.is_valid_contour(approx, IM_WIDTH, IM_HEIGHT):
+#         approx_contours.append(approx)
+#         break
+#
+# # If we did not find any valid contours, just use the whole image
+# if not approx_contours:
+#     TOP_RIGHT = (IM_WIDTH, 0)
+#     BOTTOM_RIGHT = (IM_WIDTH, IM_HEIGHT)
+#     BOTTOM_LEFT = (0, IM_HEIGHT)
+#     TOP_LEFT = (0, 0)
+#     screenCnt = np.array([[TOP_RIGHT], [BOTTOM_RIGHT], [BOTTOM_LEFT], [TOP_LEFT]])
+# else:
+#     screenCnt = max(approx_contours, key=cv2.contourArea)
+#
+# screenCnt = screenCnt.reshape(4, 2)
+#
+# # apply perspective transformation
+# warped = transform.four_point_transform(orig, screenCnt * ratio)
+# gray = cv2.cvtColor(warped, cv2.COLOR_BGR2GRAY)
+#
+# sharpen = cv2.GaussianBlur(gray, (0, 0), 3)
+# sharpen = cv2.addWeighted(gray, 2.5, sharpen, -0.5, 0)
+#
+# thresh = cv2.adaptiveThreshold(sharpen, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 15)
 
-        #return thresh
+# return thresh
