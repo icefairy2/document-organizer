@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 from django.db import models
 
 # Create your models here.
@@ -19,7 +22,7 @@ class Group(models.Model):
 class Document(models.Model):
     name = models.CharField(max_length=120)
     filePath = models.CharField(max_length=500)
-    scanningDate = models.DateTimeField(default=timezone.now)
+    scanningDate = models.DateTimeField(null=True, blank=True)
     group = models.ForeignKey(
         Group,
         on_delete=models.CASCADE,

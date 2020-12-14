@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-
+from scipy.spatial import distance as dist
 
 def reorder(myPoints):
     myPoints = myPoints.reshape((4, 2))
@@ -97,3 +97,61 @@ def stackImages(imgArray, scale, labels=[]):
                             cv2.FONT_HERSHEY_COMPLEX,
                             0.7, (255, 0, 255), 2)
     return ver
+
+def resize(image, width = None, height = None, inter = cv2.INTER_AREA):
+	# initialize the dimensions of the image to be resized and
+	# grab the image size
+	dim = None
+	(h, w) = image.shape[:2]
+
+	# if both the width and height are None, then return the
+	# original image
+	if width is None and height is None:
+		return image
+
+	# check to see if the width is None
+	if width is None:
+		# calculate the ratio of the height and construct the
+		# dimensions
+		r = height / float(h)
+		dim = (int(w * r), height)
+
+	# otherwise, the height is None
+	else:
+		# calculate the ratio of the width and construct the
+		# dimensions
+		r = width / float(w)
+		dim = (width, int(h * r))
+
+	# resize the image
+	resized = cv2.resize(image, dim, interpolation = inter)
+
+	# return the resized image
+	return resized
+
+def order_points(pts):
+    # sort the points based on their x-coordinates
+    xSorted = pts[np.argsort(pts[:, 0]), :]
+
+    # grab the left-most and right-most points from the sorted
+    # x-roodinate points
+    leftMost = xSorted[:2, :]
+    rightMost = xSorted[2:, :]
+
+    # now, sort the left-most coordinates according to their
+    # y-coordinates so we can grab the top-left and bottom-left
+    # points, respectively
+    leftMost = leftMost[np.argsort(leftMost[:, 1]), :]
+    (tl, bl) = leftMost
+
+    # now that we have the top-left coordinate, use it as an
+    # anchor to calculate the Euclidean distance between the
+    # top-left and right-most points; by the Pythagorean
+    # theorem, the point with the largest distance will be
+    # our bottom-right point
+    D = dist.cdist(tl[np.newaxis], rightMost, "euclidean")[0]
+    (br, tr) = rightMost[np.argsort(D)[::-1], :]
+
+    # return the coordinates in top-left, top-right,
+    # bottom-right, and bottom-left order
+    return np.array([tl, tr, br, bl], dtype="float32")
