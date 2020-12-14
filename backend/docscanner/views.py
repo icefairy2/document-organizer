@@ -113,11 +113,13 @@ def document(request, file=''):
 
         if new_name != '':
             x = new_name.splitlines()
-        #    print("111111111111111 my file name is: " , x[0])
-
+        # #    print("111111111111111 my file name is: " , x[0])
             file_name = x[0] + '.jpg'
+        #     print("111111111111111 my file name is: ", file_name)
+            if x[0] == '' or x[0].startswith(" "):
+                file_name = 'doc__' + '.jpg'
         else:
-           file_name = 'doc_' + dt_string + '.jpg'
+            file_name = 'doc_' + dt_string + '.jpg'
         file_path = os.path.join(settings.MEDIA_ROOT, file_name)
         file_date = dt_string
         file_group = None
