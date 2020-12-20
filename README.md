@@ -54,9 +54,17 @@ If the above command fails, install all packages from the file with
 pip install <package-name>
 ```
 
+If pytesseract fails to install, we used the binaries available at https://github.com/UB-Mannheim/tesseract/wiki.
+
 To generate the database:
 ```
+python manage.py makemigrations
 python manage.py migrate
+```
+
+If it is required for you to have an administrator account for the database (i.e. to access and modify its contents), run:
+```
+python manage.py createsuperuser
 ```
 
 To start the backend, go to folder *backend* and run:
@@ -65,6 +73,7 @@ python manage.py runserver
 ```
 
 Create folder _scanned_documents_ under *document-organizer/backend*.
+If you want your scanned documents to be saved in another folder, modify the setting `MEDIA_ROOT` in file _backend/backend/settings.py_.
 
 ### Frontend
 Go to folder *frontend*.
